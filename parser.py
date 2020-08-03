@@ -11,4 +11,4 @@ for id in range(1,11):
     if response.ok:
         filename = f"id{id}.txt"
         with open(f"{PATCH}/{filename}", "w") as file:
-            file.write(response.text )
+            file.write(response.text)
