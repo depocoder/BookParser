@@ -41,25 +41,28 @@ def parsing_image(id):
     img_src = soup.find('div', class_ = 'bookimage').find('img')['src']
     return urljoin('http://tululu.org', img_src)
 
-def download_img(PATCH,url_img):
-    response = requests.get(url_download, allow_redirects=False)
-    filename = f"{url_img.split('/')[-1]}.jpg"
-    folder = os.path.join(PATCH, filename)
+def download_img(PATCH_IMG,url_img):
+
+    response = requests.get(url_img, allow_redirects=False)
+    filename = f"{url_img.split('/')[-1]}"
+    folder = os.path.join(PATCH_IMG, filename)
+    print(response.url)
     with open(folder, "wb") as file:
         return file.write(response.content)
 
 if __name__ == '__main__':
-    PATCH = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\books"
-    Path(PATCH).mkdir(parents=True, exist_ok=True)
-  
+    PATCH_BOOKS = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\books"
+    Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
+    PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
+    Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
     for id in range(1,11):
         url_download = f'http://tululu.org/txt.php?id={id}'
         
         response = requests.get(url_download, allow_redirects=False)
         if not response.status_code == 302:
             url_img = parsing_image(id)
-            download_img(PATCH,url_img)
+            download_img(PATCH_IMG,url_img)
             filename = f"{id}. {parsing_text(id)}.txt"
-            folder = os.path.join(PATCH, filename)
+            folder = os.path.join(PATCH_BOOKS, filename)
             with open(folder, "w") as file:
                 file.write(response.text)
