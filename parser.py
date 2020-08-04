@@ -38,14 +38,9 @@ def parsing_comments(id):
     url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
-    title_tag = soup.find_all('div',class_ = "texts")
-    summ = len(title_tag)
-    if summ > 10:
-        summ = 10
-    for comment in range(summ):
-        print(title_tag[comment].find('span').text)
-
+    title_tag = soup.select(".texts[style='margin:0;padding:0 10px;'] > .black")
     return title_tag
+
 
 def parsing_image(id):
     """Функция для парсинга картинок книг с сайта http://tululu.org.
