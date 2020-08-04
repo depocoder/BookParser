@@ -3,6 +3,7 @@ import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
+from urllib.parse import urlparse
 
 
 def parsing_text(id):
