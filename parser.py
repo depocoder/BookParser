@@ -38,9 +38,12 @@ def parsing_comments(id):
     url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
-    title_tag = soup.find_all('span',class_='red')
-    print(title_tag)
-    #parse_book = (title_tag.text)
+    title_tag = soup.find_all('div',class_ = "texts")
+    summ = len(title_tag)
+    if summ > 10:
+        summ = 10
+    for comment in range(summ):
+        print(title_tag[comment].find('span').text)
 
     return title_tag
 
@@ -73,7 +76,7 @@ if __name__ == '__main__':
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
-    for id in range(5,7):
+    for id in range(5,6):
         url_download = f'http://tululu.org/txt.php?id={id}'
         
         response = requests.get(url_download, allow_redirects=False)
