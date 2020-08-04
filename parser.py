@@ -3,7 +3,7 @@ import requests
 from pathlib import Path
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-from urllib.parse import urlparse
+from urllib.parse import urljoin
 
 
 def parsing_text(id):
@@ -17,15 +17,15 @@ def parsing_text(id):
         str: Путь до файла, куда сохранён текст.
     """
     url_book = f'http://tululu.org/b{id}/'
-    response_book = requests.get(url_book)
-    soup = BeautifulSoup(response_book.text, 'lxml')
+    response = requests.get(url_book)
+    soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find('h1')
     parse_book = (title_tag.text.strip())
     parse_book = parse_book.split(' \xa0 :: \xa0 ')
 
     return parse_book[0] + ' -- ' +  parse_book[1]
 
-def parse_image(id):
+def parsing_image(id):
     """Функция для парсинга картинок книг с сайта http://tululu.org.
 
     Args:
@@ -36,22 +36,30 @@ def parse_image(id):
         str: Путь до файла, куда сохранён текст.
     """
     url_book = f'http://tululu.org/b{id}/'
-    response_book = requests.get(url_book)
-    soup = BeautifulSoup(response_book.text, 'lxml')
+    response = requests.get(url_book)
+    soup = BeautifulSoup(response.text, 'lxml')
     img_src = soup.find('div', class_ = 'bookimage').find('img')['src']
-    return 'http://tululu.org'+ img_src
+    return urljoin('http://tululu.org', img_src)
+
+def download_img(PATCH,url_img):
+    response = requests.get(url_download, allow_redirects=False)
+    filename = f"{url_img.split('/')[-1]}.jpg"
+    folder = os.path.join(PATCH, filename)
+    with open(folder, "wb") as file:
+        return file.write(response.content)
 
 if __name__ == '__main__':
     PATCH = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\books"
     Path(PATCH).mkdir(parents=True, exist_ok=True)
-
+  
     for id in range(1,11):
         url_download = f'http://tululu.org/txt.php?id={id}'
         
-        response_download = requests.get(url_download, allow_redirects=False)
-        if not response_download.status_code == 302:
-            print(parse_image(id))
+        response = requests.get(url_download, allow_redirects=False)
+        if not response.status_code == 302:
+            url_img = parsing_image(id)
+            download_img(PATCH,url_img)
             filename = f"{id}. {parsing_text(id)}.txt"
             folder = os.path.join(PATCH, filename)
             with open(folder, "w") as file:
-                file.write(response_download.text)
+                file.write(response.text)
