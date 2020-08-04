@@ -6,6 +6,15 @@ from pathvalidate import sanitize_filename
 
 
 def parsing_page():
+    """Функция для парсинга названия книг с сайта http://tululu.org.
+
+    Args:
+        url (str): Cсылка на текст, который хочется скачать.
+        filename (str): Имя файла, с которым сохранять.
+
+    Returns:
+        str: Путь до файла, куда сохранён текст.
+    """
     url_book = f'http://tululu.org/b{id}/'
     response_book = requests.get(url_book, allow_redirects=False)
     soup = BeautifulSoup(response_book.text, 'lxml')
