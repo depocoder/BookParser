@@ -39,7 +39,30 @@ def parsing_comments(id):
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.select(".texts[style='margin:0;padding:0 10px;'] > .black")
-    return title_tag
+    comments = []
+    for comment in title_tag:
+        comments.append(comment.text)
+    return comments
+
+def parsing_genres(id):
+    """Функция для парсинга комментариев книг с сайта http://tululu.org.
+
+    Args:
+        url_book (str): Cсылка на книгу которую парсим.
+        parse_book (list): (0)Название книги, (1)Автор.
+
+    Returns:
+        str: Путь до файла, куда сохранён текст.
+    """
+    url_book = f'http://tululu.org/b{id}/'
+    response = requests.get(url_book)
+    soup = BeautifulSoup(response.text, 'lxml')
+    genres_p = soup.find('span', class_ = 'd_book').find_all('a')
+    genres = []
+    for genre in genres_p:
+        genres.append(genre.text)
+    return genres
+
 
 
 def parsing_image(id):
@@ -71,12 +94,12 @@ if __name__ == '__main__':
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
-    for id in range(5,6):
+    for id in range(1,10):
         url_download = f'http://tululu.org/txt.php?id={id}'
         
         response = requests.get(url_download, allow_redirects=False)
         if not response.status_code == 302:
-            parsing_comments(id)
+            print(parsing_genres(id))
             url_img = parsing_image(id)
             download_img(PATCH_IMG,url_img)
             filename = f"{id}. {parsing_text(id)}.txt"
