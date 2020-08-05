@@ -50,10 +50,10 @@ def parsing_image(id,url_book):
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     img_src = soup.find('div', class_ = 'bookimage').find('img')['src']
-    return urljoin('http://tululu.org', img_src)
+    return img_src
 
 def download_img(PATCH_IMG,url_img):
-
+    url_img = urljoin('http://tululu.org', url_img)
     response = requests.get(url_img, allow_redirects=False)
     filename = f"{url_img.split('/')[-1]}"
     folder = os.path.join(PATCH_IMG, filename)
@@ -75,21 +75,24 @@ if __name__ == '__main__':
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
     urls = parsing_url()
+    list = []
     for id in range(10):
         url_book = urls[id]
         url_img = parsing_image(id,url_book)
         book_info = parsing_text(id,url_book).split(' -- ')
         comments = parsing_comments(id,url_book)
         genres = parsing_genres(id,url_book)
+        url_src = os.path.join('images',url_img.split('/')[-1])
         fantosy_book = {
             'title':book_info[0],
             "author": book_info[1],
-            'img_src':url_img,
+            'img_src':url_src,
             'comments':comments,
             "genres": genres
         }
-        with open("capitals.json", "w", encoding='utf-8') as my_file:
-            json.dump(fantosy_book,my_file,ensure_ascii=False)
+        list.append(fantosy_book)
         download_img(PATCH_IMG,url_img)
         download_book(url_book,id)
+    with open("capitals.json", "a", encoding='utf-8') as my_file:
+        json.dump(list,my_file, indent=4 ,ensure_ascii=False)
 
