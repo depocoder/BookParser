@@ -7,15 +7,6 @@ from urllib.parse import urljoin
 import json
 
 def parsing_text(id,url_book):
-    """Функция для парсинга названия книг с сайта http://tululu.org.
-
-    Args:
-        url_book (str): Cсылка на книгу которую парсим.
-        parse_book (list): (0)Название книги, (1)Автор.
-
-    Returns:
-        str: Путь до файла, куда сохранён текст.
-    """
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find('h1')
@@ -25,15 +16,6 @@ def parsing_text(id,url_book):
     return sanitize_filename(parse_book[0]) + ' -- ' +  sanitize_filename(parse_book[1])
 
 def parsing_comments(id,url_book):
-    """Функция для парсинга комментариев книг с сайта http://tululu.org.
-
-    Args:
-        url_book (str): Cсылка на книгу которую парсим.
-        parse_book (list): (0)Название книги, (1)Автор.
-
-    Returns:
-        str: Путь до файла, куда сохранён текст.
-    """
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find_all('div',class_='texts')
@@ -44,15 +26,6 @@ def parsing_comments(id,url_book):
     return comments
 
 def parsing_genres(id,url_book):
-    """Функция для парсинга комментариев книг с сайта http://tululu.org.
-
-    Args:
-        url_book (str): Cсылка на книгу которую парсим.
-        parse_book (list): (0)Название книги, (1)Автор.
-
-    Returns:
-        str: Путь до файла, куда сохранён текст.
-    """
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     genres_p = soup.find('span', class_ = 'd_book').find_all('a')
@@ -62,15 +35,6 @@ def parsing_genres(id,url_book):
     return genres
 
 def parsing_url():
-    """Функция для парсинга ссылок на фантастику с сайта http://tululu.org.
-
-    Args:
-        url_book (str): Cсылка на книгу которую парсим.
-        parse_book (list): (0)Название книги, (1)Автор.
-
-    Returns:
-        str: Путь до файла, куда сохранён текст.
-    """
     genre_links = []
     for id in range(1,5):
         url_book = f'http://tululu.org/l55/{id}'
@@ -83,15 +47,6 @@ def parsing_url():
     return genre_links
 
 def parsing_image(id,url_book):
-    """Функция для парсинга картинок книг с сайта http://tululu.org.
-
-    Args:
-        url_book (str): Cсылка на книгу которую парсим.
-        parse_book (list): (0)Название книги, (1)Автор.
-
-    Returns:
-        str: Путь до файла, куда сохранён текст.
-    """
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     img_src = soup.find('div', class_ = 'bookimage').find('img')['src']
