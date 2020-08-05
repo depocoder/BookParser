@@ -75,9 +75,21 @@ if __name__ == '__main__':
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
     urls = parsing_url()
-    for id in range(100):
+    for id in range(10):
         url_book = urls[id]
-
         url_img = parsing_image(id,url_book)
+        book_info = parsing_text(id,url_book).split(' -- ')
+        comments = parsing_comments(id,url_book)
+        genres = parsing_genres(id,url_book)
+        fantosy_book = {
+            'title':book_info[0],
+            "author": book_info[1],
+            'img_src':url_img,
+            'comments':comments,
+            "genres": genres
+        }
+        with open("capitals.json", "w", encoding='utf-8') as my_file:
+            json.dump(fantosy_book,my_file,ensure_ascii=False)
         download_img(PATCH_IMG,url_img)
         download_book(url_book,id)
+
