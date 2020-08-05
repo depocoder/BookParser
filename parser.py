@@ -72,7 +72,7 @@ def parsing_url():
         str: Путь до файла, куда сохранён текст.
     """
     genre_links = []
-    for id in range(1,4):
+    for id in range(1,5):
         url_book = f'http://tululu.org/l55/{id}'
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
@@ -110,14 +110,16 @@ if __name__ == '__main__':
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
-    for id in range(1,100):
+    urls = parsing_url()
+    for id in range(100):
         url_download = f'http://tululu.org/txt.php?id={id}'
-        url_book = parsing_url()[id]
+        print(len(parsing_url()),len(urls))
+        url_book = urls[id]
         response = requests.get(url_download, allow_redirects=False)
         if not response.status_code == 302:
             url_img = parsing_image(id,url_book)
             download_img(PATCH_IMG,url_img)
             filename = f"{id}. {parsing_text(id,url_book)}.txt"
             folder = os.path.join(PATCH_BOOKS, filename)
-            with open(folder, "w") as file:
+            with open(folder, "w", encoding='utf-8') as file:
                 file.write(response.text)
