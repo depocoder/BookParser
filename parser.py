@@ -60,6 +60,15 @@ def download_img(PATCH_IMG,url_img):
     with open(folder, "wb") as file:
         return file.write(response.content)
 
+def download_book(url_book,id):    
+    id_download = url_book[url_book.find('/b')+2:-1] #так как для закачки книги ссылка совсем другая нужен id
+    url_download = f'http://tululu.org/txt.php?id={id_download}'
+    response = requests.get(url_download, allow_redirects=False)
+    filename = f"{id+1}. {parsing_text(id_download,url_book)}.txt"
+    folder = os.path.join(PATCH_BOOKS, filename)
+    with open(folder, "w", encoding='utf-8') as file:
+        return file.write(response.text)
+
 if __name__ == '__main__':
     PATCH_BOOKS = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\books"
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
@@ -68,12 +77,7 @@ if __name__ == '__main__':
     urls = parsing_url()
     for id in range(100):
         url_book = urls[id]
-        id_download = url_book[url_book.find('/b')+2:-1] #так как для закачки книги ссылка совсем другая нужен id
-        url_download = f'http://tululu.org/txt.php?id={id_download}'
-        response = requests.get(url_download, allow_redirects=False)
+
         url_img = parsing_image(id,url_book)
         download_img(PATCH_IMG,url_img)
-        filename = f"{id+1}. {parsing_text(id_download,url_book)}.txt"
-        folder = os.path.join(PATCH_BOOKS, filename)
-        with open(folder, "w", encoding='utf-8') as file:
-            file.write(response.text)
+        download_book(url_book,id)
