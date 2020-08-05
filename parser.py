@@ -61,7 +61,7 @@ def parsing_genres(id,url_book):
         genres.append(genre.text)
     return genres
 
-def parsing_url(id):
+def parsing_url():
     """Функция для парсинга ссылок на фантастику с сайта http://tululu.org.
 
     Args:
@@ -71,14 +71,15 @@ def parsing_url(id):
     Returns:
         str: Путь до файла, куда сохранён текст.
     """
-    url_book = f'http://tululu.org/l55/{id}'
-    response = requests.get(url_book)
-    soup = BeautifulSoup(response.text, 'lxml')
-    link_parse = soup.find_all('table', class_= 'd_book')
     genre_links = []
-    for link in link_parse:
-        link = link.find('a')['href']
-        genre_links.append(urljoin('http://tululu.org',link))
+    for id in range(1,4):
+        url_book = f'http://tululu.org/l55/{id}'
+        response = requests.get(url_book)
+        soup = BeautifulSoup(response.text, 'lxml')
+        link_parse = soup.find_all('table', class_= 'd_book')
+        for link in link_parse:
+            link = link.find('a')['href']
+            genre_links.append(urljoin('http://tululu.org',link))
     return genre_links
 
 def parsing_image(id,url_book):
@@ -111,7 +112,7 @@ if __name__ == '__main__':
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
     for id in range(1,100):
         url_download = f'http://tululu.org/txt.php?id={id}'
-        url_book = link
+        url_book = parsing_url()[id]
         response = requests.get(url_download, allow_redirects=False)
         if not response.status_code == 302:
             url_img = parsing_image(id,url_book)
