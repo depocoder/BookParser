@@ -20,10 +20,10 @@ def parsing_text(id):
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find('h1')
-    parse_book = (title_tag.text.strip())
+    parse_book = title_tag.text.strip()
     parse_book = parse_book.split(' \xa0 :: \xa0 ')
 
-    return parse_book[0] + ' -- ' +  parse_book[1]
+    return sanitize_filename(parse_book[0]) + ' -- ' +  sanitize_filename(parse_book[1])
 
 def parsing_comments(id):
     """Функция для парсинга комментариев книг с сайта http://tululu.org.
@@ -38,10 +38,11 @@ def parsing_comments(id):
     url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
-    title_tag = soup.select(".texts[style='margin:0;padding:0 10px;'] > .black")
+    title_tag = soup.find_all('div',class_='texts')
     comments = []
-    for comment in title_tag:
-        comments.append(comment.text)
+    if title_tag:
+        for comment in title_tag:
+            comments.append(comment.find('span').text)
     return comments
 
 def parsing_genres(id):
@@ -63,6 +64,25 @@ def parsing_genres(id):
         genres.append(genre.text)
     return genres
 
+def parsing_url(id):
+    """Функция для парсинга ссылок на фантастику с сайта http://tululu.org.
+
+    Args:
+        url_book (str): Cсылка на книгу которую парсим.
+        parse_book (list): (0)Название книги, (1)Автор.
+
+    Returns:
+        str: Путь до файла, куда сохранён текст.
+    """
+    url_book = f'http://tululu.org/l55/{id}'
+    response = requests.get(url_book)
+    soup = BeautifulSoup(response.text, 'lxml')
+    link_parse = soup.find_all('table', class_= 'd_book')
+    genre_links = []
+    for link in link_parse:
+        link = link.find('a')['href']
+        genre_links.append(urljoin('http://tululu.org',link))
+    return genre_links
 
 
 def parsing_image(id):
@@ -96,10 +116,10 @@ if __name__ == '__main__':
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
     for id in range(1,10):
         url_download = f'http://tululu.org/txt.php?id={id}'
-        
+        for link in parsing_url(id):
+            print(link) 
         response = requests.get(url_download, allow_redirects=False)
         if not response.status_code == 302:
-            print(parsing_genres(id))
             url_img = parsing_image(id)
             download_img(PATCH_IMG,url_img)
             filename = f"{id}. {parsing_text(id)}.txt"
