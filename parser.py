@@ -4,9 +4,9 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
+import json
 
-
-def parsing_text(id):
+def parsing_text(id,url_book):
     """Функция для парсинга названия книг с сайта http://tululu.org.
 
     Args:
@@ -16,7 +16,6 @@ def parsing_text(id):
     Returns:
         str: Путь до файла, куда сохранён текст.
     """
-    url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find('h1')
@@ -25,7 +24,7 @@ def parsing_text(id):
 
     return sanitize_filename(parse_book[0]) + ' -- ' +  sanitize_filename(parse_book[1])
 
-def parsing_comments(id):
+def parsing_comments(id,url_book):
     """Функция для парсинга комментариев книг с сайта http://tululu.org.
 
     Args:
@@ -35,7 +34,6 @@ def parsing_comments(id):
     Returns:
         str: Путь до файла, куда сохранён текст.
     """
-    url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find_all('div',class_='texts')
@@ -45,7 +43,7 @@ def parsing_comments(id):
             comments.append(comment.find('span').text)
     return comments
 
-def parsing_genres(id):
+def parsing_genres(id,url_book):
     """Функция для парсинга комментариев книг с сайта http://tululu.org.
 
     Args:
@@ -55,7 +53,6 @@ def parsing_genres(id):
     Returns:
         str: Путь до файла, куда сохранён текст.
     """
-    url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     genres_p = soup.find('span', class_ = 'd_book').find_all('a')
@@ -84,8 +81,7 @@ def parsing_url(id):
         genre_links.append(urljoin('http://tululu.org',link))
     return genre_links
 
-
-def parsing_image(id):
+def parsing_image(id,url_book):
     """Функция для парсинга картинок книг с сайта http://tululu.org.
 
     Args:
@@ -95,7 +91,6 @@ def parsing_image(id):
     Returns:
         str: Путь до файла, куда сохранён текст.
     """
-    url_book = f'http://tululu.org/b{id}/'
     response = requests.get(url_book)
     soup = BeautifulSoup(response.text, 'lxml')
     img_src = soup.find('div', class_ = 'bookimage').find('img')['src']
@@ -114,15 +109,14 @@ if __name__ == '__main__':
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
-    for id in range(1,10):
+    for id in range(1,100):
         url_download = f'http://tululu.org/txt.php?id={id}'
-        for link in parsing_url(id):
-            print(link) 
+        url_book = link
         response = requests.get(url_download, allow_redirects=False)
         if not response.status_code == 302:
-            url_img = parsing_image(id)
+            url_img = parsing_image(id,url_book)
             download_img(PATCH_IMG,url_img)
-            filename = f"{id}. {parsing_text(id)}.txt"
+            filename = f"{id}. {parsing_text(id,url_book)}.txt"
             folder = os.path.join(PATCH_BOOKS, filename)
             with open(folder, "w") as file:
                 file.write(response.text)
