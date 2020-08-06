@@ -115,11 +115,11 @@ if __name__ == '__main__':
     json_paath = ''
 
     if dest_folder:
-        json_paatch = dest_folder
+        json_paath = dest_folder
     
     if json_path:
-        json_paatch = json_path
+        json_paath = json_path
 
-    json_paatch = os.path.join(json_paatch, "about_books.json")
-    with open(json_paatch, "w", encoding='utf-8') as my_file:
+    json_paath = os.path.join(json_paath, "about_books.json")
+    with open(json_paath, "w", encoding='utf-8') as my_file:
         json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
