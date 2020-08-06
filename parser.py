@@ -110,7 +110,7 @@ if __name__ == '__main__':
             download_book(url_book,id)
 
         if not skip_imgs:
-            download_img(dest_folder,url_img)
+            download_img(url_img)
 
     json_paath = ''
 
