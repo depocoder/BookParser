@@ -1,7 +1,7 @@
 *env
 .DS_Store
 .env
-.about_books
+*about_books
 .gitattributes
 *books
 *images
