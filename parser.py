@@ -65,7 +65,7 @@ if __name__ == '__main__':
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
     urls = parsing_url()
-    list = []
+    books_info = []
     for id in range(10):
         url_book = urls[id]
         response = requests.get(url_book)
@@ -84,9 +84,9 @@ if __name__ == '__main__':
             'comments':comments,
             "genres": genres
         }
-        list.append(book_info)
+        books_info.append(book_info)
         download_img(PATCH_IMG,url_img)
         download_book(url_book,id)
-    with open("capitals.json", "a", encoding='utf-8') as my_file:
-        json.dump(list,my_file, indent=4 ,ensure_ascii=False)
+    with open("about_books.json", "a", encoding='utf-8') as my_file:
+        json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
 
