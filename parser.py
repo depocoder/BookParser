@@ -40,7 +40,7 @@ def download_img(PATCH_IMG,url_img):
         return file.write(response.content)
 
 def download_book(url_book,id):    
-    id_download = url_book[url_book.find('/b')+2:-1] #так как для закачки книги ссылка совсем другая нужен id
+    id_download = url_book[url_book.find('/b')+2:-1]
     url_download = f'http://tululu.org/txt.php?id={id_download}'
     response = requests.get(url_download, allow_redirects=False)
     filename = f"{id+1}-я книга. {parsing_text(soup)}.txt"
@@ -71,10 +71,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Этот проект позволяет парсить книги из открытого доступа.')
     parser.add_argument('--start_page',default=1, help='Страница с которой начинается парсинг', type=int)
     parser.add_argument('--end_page', default=1, help='Страница на которой закончится парсинг', type=int)
-    parser.add_argument('--json_path', default='', help='Страница на которой закончится парсинг', type=str)
-    parser.add_argument('--dest_folder', default='', help='Страница на которой закончится парсинг', type=str)
-    parser.add_argument('--skip_txt', default=False, help='Страница на которой закончится парсинг', type = bool)
-    parser.add_argument('--skip_imgs', default=False, help='Страница на которой закончится парсинг', type = bool)
+    parser.add_argument('--json_path', default='', help='указать свой путь к *.json файлу с результатами ', type=str)
+    parser.add_argument('--dest_folder', default='', help='путь к каталогу с результатами парсинга: картинкам, книгам, JSON. ', type=str)
+    parser.add_argument('--skip_txt', default=False, help='не скачивать книги, указать "False"  ', type = bool)
+    parser.add_argument('--skip_imgs', default=False, help='не скачивать картинки, указать "False"   ', type = bool)
     args = parser.parse_args()
     start_page = args.start_page
     end_page = args.end_page
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     
     if json_path:
         json_paatch = json_path
-        
+
     json_paatch = os.path.join(json_paatch, "about_books.json")
     with open(json_paatch, "w", encoding='utf-8') as my_file:
         json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
