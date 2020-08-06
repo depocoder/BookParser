@@ -70,6 +70,7 @@ if __name__ == '__main__':
         url_book = urls[id]
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
+
         url_img = parsing_image(soup)
         book_info = parsing_text(soup).split(' -- ')
         comments = parsing_comments(soup)
@@ -85,8 +86,10 @@ if __name__ == '__main__':
             "genres": genres
         }
         books_info.append(book_info)
+
         download_img(PATCH_IMG,url_img)
         download_book(url_book,id)
+
     with open("about_books.json", "a", encoding='utf-8') as my_file:
         json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
 
