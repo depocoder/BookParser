@@ -35,7 +35,7 @@ def parsing_image(soup):
 def download_img(PATCH_IMG,url_img):
     response = requests.get(url_img, allow_redirects=False)
     filename = f"{url_img.split('/')[-1]}"
-    folder = os.path.join(PATCH_IMG, filename)
+    folder = os.path.join(dest_folder,'images', filename)
     with open(folder, "wb") as file:
         return file.write(response.content)
 
@@ -44,7 +44,7 @@ def download_book(url_book,id):
     url_download = f'http://tululu.org/txt.php?id={id_download}'
     response = requests.get(url_download, allow_redirects=False)
     filename = f"{id+1}-я книга. {parsing_text(soup)}.txt"
-    folder = os.path.join(PATCH_BOOKS, filename)
+    folder = os.path.join(dest_folder,'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         return file.write(response.text)
 
@@ -65,21 +65,26 @@ def parsing_url(start_page,end_page):
 
 if __name__ == '__main__':
     PATCH_BOOKS = r"books"
-    Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
+    
     PATCH_IMG = r"images"
-    Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
-
+    
     parser = argparse.ArgumentParser(description='Этот проект позволяет парсить книги из открытого доступа.')
     parser.add_argument('--start_page',default=1, help='Страница с которой начинается парсинг', type=int)
     parser.add_argument('--end_page', default=1, help='Страница на которой закончится парсинг', type=int)
-    parser.add_argument('--skip_txt', default=False, help='Страница на которой закончится парсинг', type=int)
-    parser.add_argument('--skip_imgs', default=False, help='Страница на которой закончится парсинг', type=int)
+    parser.add_argument('--json_path', default='', help='Страница на которой закончится парсинг', type=str)
+    parser.add_argument('--dest_folder', default='', help='Страница на которой закончится парсинг', type=str)
+    parser.add_argument('--skip_txt', default=False, help='Страница на которой закончится парсинг', type = bool)
+    parser.add_argument('--skip_imgs', default=False, help='Страница на которой закончится парсинг', type = bool)
     args = parser.parse_args()
     start_page = args.start_page
     end_page = args.end_page
     skip_imgs = args.skip_imgs
     skip_txt = args.skip_txt
+    json_path = args.json_path
+    dest_folder = args.dest_folder
 
+    Path(dest_folder,'images').mkdir(parents=True, exist_ok=True)
+    Path(dest_folder,'books').mkdir(parents=True, exist_ok=True)
     urls = parsing_url(start_page,end_page)
     books_info = []
     for id in range(len(urls)):
@@ -92,8 +97,8 @@ if __name__ == '__main__':
         book_info = parsing_text(soup).split(' -- ')
         comments = parsing_comments(soup)
         genres = parsing_genres(soup)
-        url_src = os.path.join('images',url_img.split('/')[-1])
-        book_path = os.path.join('books',book_info[0] + '.txt')
+        url_src = os.path.join(dest_folder,'images',url_img.split('/')[-1])
+        book_path = os.path.join(dest_folder,'books',book_info[0] + '.txt')
         book_info = {
             'title':book_info[0],
             "author": book_info[1],
@@ -105,10 +110,10 @@ if __name__ == '__main__':
         books_info.append(book_info)
 
         if not skip_txt:
-            download_img(PATCH_IMG,url_img)
-
-        if not skip_imgs:
             download_book(url_book,id)
 
-    #with open("about_books.json", "w", encoding='utf-8') as my_file:
-        #json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
+        if not skip_imgs:
+            download_img(PATCH_IMG,url_img)
+    
+    with open("about_books.json", "w", encoding='utf-8') as my_file:
+        json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
