@@ -113,7 +113,16 @@ if __name__ == '__main__':
             download_book(url_book,id)
 
         if not skip_imgs:
-            download_img(PATCH_IMG,url_img)
+            download_img(dest_folder,url_img)
+
+    json_paath = ''
+
+    if dest_folder:
+        json_paatch = dest_folder
     
-    with open("about_books.json", "w", encoding='utf-8') as my_file:
+    if json_path:
+        json_paatch = json_path
+        
+    json_paatch = os.path.join(json_paatch, "about_books.json")
+    with open(json_paatch, "w", encoding='utf-8') as my_file:
         json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
