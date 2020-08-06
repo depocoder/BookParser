@@ -32,7 +32,7 @@ def parsing_image(soup):
     img_src = soup.select_one('div.bookimage img')['src']
     return urljoin('http://tululu.org', img_src)
 
-def download_img(PATCH_IMG,url_img):
+def download_img(url_img):
     response = requests.get(url_img, allow_redirects=False)
     filename = f"{url_img.split('/')[-1]}"
     folder = os.path.join(dest_folder,'images', filename)
@@ -64,9 +64,6 @@ def parsing_url(start_page,end_page):
     return genre_links
 
 if __name__ == '__main__':
-    PATCH_BOOKS = r"books"
-    
-    PATCH_IMG = r"images"
     
     parser = argparse.ArgumentParser(description='Этот проект позволяет парсить книги из открытого доступа.')
     parser.add_argument('--start_page',default=1, help='Страница с которой начинается парсинг', type=int)
