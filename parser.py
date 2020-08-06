@@ -72,9 +72,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Этот проект позволяет парсить книги из открытого доступа.')
     parser.add_argument('--start_page',default=1, help='Страница с которой начинается парсинг', type=int)
     parser.add_argument('--end_page', default=1, help='Страница на которой закончится парсинг', type=int)
+    parser.add_argument('--skip_txt', default=False, help='Страница на которой закончится парсинг', type=int)
+    parser.add_argument('--skip_imgs', default=False, help='Страница на которой закончится парсинг', type=int)
     args = parser.parse_args()
     start_page = args.start_page
     end_page = args.end_page
+    skip_imgs = args.skip_imgs
+    skip_txt = args.skip_txt
 
     urls = parsing_url(start_page,end_page)
     books_info = []
@@ -100,8 +104,11 @@ if __name__ == '__main__':
         }
         books_info.append(book_info)
 
-        #download_img(PATCH_IMG,url_img)
-        #download_book(url_book,id)
+        if not skip_txt:
+            download_img(PATCH_IMG,url_img)
+
+        if not skip_imgs:
+            download_book(url_book,id)
 
     #with open("about_books.json", "w", encoding='utf-8') as my_file:
         #json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
