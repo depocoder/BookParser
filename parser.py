@@ -14,21 +14,21 @@ def parsing_text(soup):
     return sanitize_filename(author) + ' -- ' +  sanitize_filename(title)
 
 def parsing_comments(soup):
-    title_tag = soup.select(".texts[style='margin:0;padding:0 10px;'] > .black")
+    title_tag = soup.select("div.texts span.black")
     comments = []
     for comment in title_tag:
         comments.append(comment.text)
     return comments
 
 def parsing_genres(soup):
-    genres_p = soup.find('span', class_ = 'd_book').find_all('a')
+    genres_p = soup.select('span.d_book a')
     genres = []
     for genre in genres_p:
         genres.append(genre.text)
     return genres
 
 def parsing_image(soup):
-    img_src = soup.find('div', class_ = 'bookimage').find('img')['src']
+    img_src = soup.select_one('div.bookimage img')['src']
     return urljoin('http://tululu.org', img_src)
 
 def download_img(PATCH_IMG,url_img):
@@ -53,9 +53,9 @@ def parsing_url():
         url_book = f'http://tululu.org/l55/{id}'
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
-        link_parse = soup.find_all('table', class_= 'd_book')
+        link_parse = soup.select('table.d_book')
         for link in link_parse:
-            link = link.find('a')['href']
+            link = link.select_one('a')['href']
             genre_links.append(urljoin('http://tululu.org',link))
     return genre_links
 
@@ -90,6 +90,6 @@ if __name__ == '__main__':
         download_img(PATCH_IMG,url_img)
         download_book(url_book,id)
 
-    with open("about_books.json", "a", encoding='utf-8') as my_file:
+    with open("about_books.json", "w", encoding='utf-8') as my_file:
         json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
 
