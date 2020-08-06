@@ -64,9 +64,9 @@ def parsing_url(start_page,end_page):
     return genre_links
 
 if __name__ == '__main__':
-    PATCH_BOOKS = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\books"
+    PATCH_BOOKS = r"books"
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
-    PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
+    PATCH_IMG = r"images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
 
     parser = argparse.ArgumentParser(description='Этот проект позволяет парсить книги из открытого доступа.')
