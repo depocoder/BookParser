@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
 import json
+import argparse
 
 def parsing_text(soup):
     header = soup.select_one("#content")
@@ -47,9 +48,12 @@ def download_book(url_book,id):
     with open(folder, "w", encoding='utf-8') as file:
         return file.write(response.text)
 
-def parsing_url():
+def parsing_url(start_page,end_page):
     genre_links = []
-    for id in range(1,5):
+    end_page += 1
+    if start_page>end_page:
+        end_page = start_page + 1
+    for id in range(start_page,end_page):
         url_book = f'http://tululu.org/l55/{id}'
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
@@ -64,10 +68,19 @@ if __name__ == '__main__':
     Path(PATCH_BOOKS).mkdir(parents=True, exist_ok=True)
     PATCH_IMG = r"C:\Users\lysak.m\Documents\py\study_prog\Many_projects\BookParser\images"
     Path(PATCH_IMG).mkdir(parents=True, exist_ok=True)
-    urls = parsing_url()
+
+    parser = argparse.ArgumentParser(description='Этот проект позволяет парсить книги из открытого доступа.')
+    parser.add_argument('--start_page',default=1, help='Страница с которой начинается парсинг', type=int)
+    parser.add_argument('--end_page', default=1, help='Страница на которой закончится парсинг', type=int)
+    args = parser.parse_args()
+    start_page = args.start_page
+    end_page = args.end_page
+
+    urls = parsing_url(start_page,end_page)
     books_info = []
-    for id in range(10):
+    for id in range(len(urls)):
         url_book = urls[id]
+        print(url_book)
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
 
@@ -87,9 +100,8 @@ if __name__ == '__main__':
         }
         books_info.append(book_info)
 
-        download_img(PATCH_IMG,url_img)
-        download_book(url_book,id)
+        #download_img(PATCH_IMG,url_img)
+        #download_book(url_book,id)
 
-    with open("about_books.json", "w", encoding='utf-8') as my_file:
-        json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
-
+    #with open("about_books.json", "w", encoding='utf-8') as my_file:
+        #json.dump(books_info,my_file, indent=4 ,ensure_ascii=False)
