@@ -37,7 +37,7 @@ def parsing_image(soup):
     return urljoin('http://tululu.org', img_src)
 
 
-def download_img(url_img):
+def download_img(url_img, dest_folder):
     response = requests.get(url_img, allow_redirects=False)
     filename = f"{url_img.split('/')[-1]}"
     folder = os.path.join(dest_folder, 'images', filename)
@@ -45,7 +45,7 @@ def download_img(url_img):
         return file.write(response.content)
 
 
-def download_book(url_book, id):
+def download_book(url_book, id, dest_folder):
     id_download = url_book[url_book.find('/b')+2:-1]
     url_download = f'http://tululu.org/txt.php?id={id_download}'
     response = requests.get(url_download, allow_redirects=False)
@@ -103,16 +103,10 @@ if __name__ == '__main__':
         help='не скачивать картинки, указать "False"   ', type=bool)
 
     args = parser.parse_args()
-    start_page = args.start_page
-    end_page = args.end_page
-    skip_imgs = args.skip_imgs
-    skip_txt = args.skip_txt
-    json_path = args.json_path
-    dest_folder = args.dest_folder
 
-    Path(dest_folder, 'images').mkdir(parents=True, exist_ok=True)
-    Path(dest_folder, 'books').mkdir(parents=True, exist_ok=True)
-    urls = parsing_url(start_page, end_page)
+    Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
+    Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
+    urls = parsing_url(args.start_page, args.end_page)
     books_info = []
     for id in range(len(urls)):
         url_book = urls[id]
@@ -124,8 +118,10 @@ if __name__ == '__main__':
         book_info = parsing_text(soup).split(' -- ')
         comments = parsing_comments(soup)
         genres = parsing_genres(soup)
-        url_src = os.path.join(dest_folder, 'images', url_img.split('/')[-1])
-        book_path = os.path.join(dest_folder, 'books', book_info[0] + '.txt')
+        url_src = os.path.join(args.dest_folder,
+                               'images', url_img.split('/')[-1])
+        book_path = os.path.join(args.dest_folder,
+                                 'books', book_info[0] + '.txt')
         book_info = {
             'title': book_info[0],
             "author": book_info[1],
@@ -136,19 +132,19 @@ if __name__ == '__main__':
         }
         books_info.append(book_info)
 
-        if not skip_txt:
-            download_book(url_book, id)
+        if not args.skip_txt:
+            download_book(url_book, id, args.dest_folder)
 
-        if not skip_imgs:
-            download_img(url_img)
+        if not args.skip_imgs:
+            download_img(url_img, args.dest_folder)
 
     json_paath = ''
 
-    if dest_folder:
-        json_paath = dest_folder
+    if args.dest_folder:
+        json_paath = args.dest_folder
 
-    if json_path:
-        json_paath = json_path
+    if args.json_path:
+        json_paath = args.json_path
 
     json_paath = os.path.join(json_paath, "about_books.json")
     with open(json_paath, "w", encoding='utf-8') as my_file:
