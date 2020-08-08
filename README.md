@@ -15,11 +15,11 @@ python3 parser.py
 ```
 # Аргументы
 **dest_folder** — путь к каталогу с результатами парсинга: картинкам, книгам, JSON.   
-**skip_imgs** — не скачивать картинки, указать 'False'   
-**skip_txt** — не скачивать книги, указать 'False'   
-**json_path** — указать свой путь к *.json файлу с результатами   
+**skip_imgs** — не скачивать картинки.   
+**skip_txt** — не скачивать книги.   
+**json_path** — указать свой путь к *.json файлу с результатами.   
     
 **Запуск кода с аргументами**   
 ```
-python3 parser.py --dest_folder C:/ --skip_imgs False   
+python3 parser.py --dest_folder C:/ --skip_imgs      
 ```
