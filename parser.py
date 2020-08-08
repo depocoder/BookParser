@@ -138,7 +138,7 @@ if __name__ == '__main__':
         if not args.skip_imgs:
             download_img(url_img, args.dest_folder)
 
-    json_path = ''
+    json_path = os.getcwd()
 
     if args.dest_folder:
         json_path = args.dest_folder
