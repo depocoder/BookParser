@@ -45,11 +45,11 @@ def download_img(url_img, dest_folder):
         return file.write(response.content)
 
 
-def download_book(url_book, id, dest_folder):
-    id_download = url_book[url_book.find('/b')+2:-1]
-    url_download = f'http://tululu.org/txt.php?id={id_download}'
+def download_book(url_book, book_num, dest_folder):
+    link_download = url_book[url_book.find('/b')+2:-1]
+    url_download = f'http://tululu.org/txt.php?id={link_download}'
     response = requests.get(url_download, allow_redirects=False)
-    filename = f"{id+1}-я книга. {parsing_text(soup)}.txt"
+    filename = f"{book_num+1}-я книга. {parsing_text(soup)}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         return file.write(response.text)
@@ -60,8 +60,8 @@ def parsing_url(start_page, end_page):
     end_page += 1
     if start_page > end_page:
         end_page = start_page + 1
-    for id in range(start_page, end_page):
-        url_book = f'http://tululu.org/l55/{id}'
+    for book_num in range(start_page, end_page):
+        url_book = f'http://tululu.org/l55/{book_num}'
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
         link_parse = soup.select('table.d_book')
@@ -108,8 +108,8 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     urls = parsing_url(args.start_page, args.end_page)
     books_info = []
-    for id in range(len(urls)):
-        url_book = urls[id]
+    for book_num in range(len(urls)):
+        url_book = urls[book_num]
         print(url_book)
         response = requests.get(url_book)
         soup = BeautifulSoup(response.text, 'lxml')
@@ -133,19 +133,19 @@ if __name__ == '__main__':
         books_info.append(book_info)
 
         if not args.skip_txt:
-            download_book(url_book, id, args.dest_folder)
+            download_book(url_book, book_num, args.dest_folder)
 
         if not args.skip_imgs:
             download_img(url_img, args.dest_folder)
 
-    json_paath = ''
+    json_path = ''
 
     if args.dest_folder:
-        json_paath = args.dest_folder
+        json_path = args.dest_folder
 
     if args.json_path:
-        json_paath = args.json_path
+        json_path = args.json_path
 
-    json_paath = os.path.join(json_paath, "about_books.json")
-    with open(json_paath, "w", encoding='utf-8') as my_file:
+    json_path = os.path.join(json_path, "about_books.json")
+    with open(json_path, "w", encoding='utf-8') as my_file:
         json.dump(books_info, my_file, indent=4, ensure_ascii=False)
