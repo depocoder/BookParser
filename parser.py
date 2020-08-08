@@ -95,12 +95,12 @@ if __name__ == '__main__':
         type=str)
 
     parser.add_argument(
-        '--skip_txt', default=False,
-        help='не скачивать книги, указать "False"', type=bool)
+        '--skip_txt', action = "store_true",
+        help='не скачивать книги, указать "False"')
 
     parser.add_argument(
-        '--skip_imgs', default=False,
-        help='не скачивать картинки, указать "False"   ', type=bool)
+        '--skip_imgs', action = "store_true",
+        help='не скачивать картинки, указать "False"')
 
     args = parser.parse_args()
 
