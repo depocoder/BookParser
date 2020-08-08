@@ -55,7 +55,7 @@ def download_book(url_book, book_num, dest_folder):
         return file.write(response.text)
 
 
-def parsing_url(start_page, end_page):
+def parsing_urls(start_page, end_page):
     genre_links = []
     end_page += 1
     if start_page > end_page:
@@ -78,15 +78,15 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--start_page', default=1,
-        help='Страница с которой начинается парсинг', type=int)
+        help='Страница с которой начинается парсинг.', type=int)
 
     parser.add_argument(
         '--end_page', default=1,
-        help='Страница на которой закончится парсинг', type=int)
+        help='Страница на которой закончится парсинг.', type=int)
 
     parser.add_argument(
         '--json_path', default='',
-        help='указать свой путь к *.json файлу с результатами ', type=str)
+        help='указать свой путь к *.json файлу с результатами.', type=str)
 
     parser.add_argument(
         '--dest_folder', default='',
@@ -95,18 +95,18 @@ if __name__ == '__main__':
         type=str)
 
     parser.add_argument(
-        '--skip_txt', action = "store_true",
-        help='не скачивать книги, указать "False"')
+        '--skip_txt', action="store_true",
+        help='не скачивать книги.')
 
     parser.add_argument(
-        '--skip_imgs', action = "store_true",
-        help='не скачивать картинки, указать "False"')
+        '--skip_imgs', action="store_true",
+        help='не скачивать картинки.')
 
     args = parser.parse_args()
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
-    urls = parsing_url(args.start_page, args.end_page)
+    urls = parsing_urls(args.start_page, args.end_page)
     books_info = []
     for book_num in range(len(urls)):
         url_book = urls[book_num]
