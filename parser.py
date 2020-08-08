@@ -71,6 +71,24 @@ def parse_urls(start_page, end_page):
     return genre_links
 
 
+def parse_info(soup):
+    book_info = parse_text(soup).split(' -- ')
+    comments = parse_comments(soup)
+    genres = parse_genres(soup)
+    url_src = os.path.join(args.dest_folder,
+                            'images', url_img.split('/')[-1])
+    book_path = os.path.join(args.dest_folder,
+                                'books', book_info[0] + '.txt')
+    book_info = {
+        'title': book_info[0],
+        "author": book_info[1],
+        'img_src': url_src,
+        'book_path': book_path,
+        'comments': comments,
+        "genres": genres
+    }
+    return book_info
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -113,24 +131,9 @@ if __name__ == '__main__':
         print(book_url)
         response = requests.get(book_url)
         soup = BeautifulSoup(response.text, 'lxml')
-
         url_img = parse_image(soup)
-        book_info = parse_text(soup).split(' -- ')
-        comments = parse_comments(soup)
-        genres = parse_genres(soup)
-        url_src = os.path.join(args.dest_folder,
-                               'images', url_img.split('/')[-1])
-        book_path = os.path.join(args.dest_folder,
-                                 'books', book_info[0] + '.txt')
-        book_info = {
-            'title': book_info[0],
-            "author": book_info[1],
-            'img_src': url_src,
-            'book_path': book_path,
-            'comments': comments,
-            "genres": genres
-        }
-        books_info.append(book_info)
+
+        books_info.append(parse_info(soup))
 
         if not args.skip_txt:
             download_book(book_url, book_num, args.dest_folder)
