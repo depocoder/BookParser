@@ -8,12 +8,12 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def parse_text(soup):
+def parse_title_author(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
     parsing_book = title_tag.text.split(' \xa0 :: \xa0 ')
     author, title = parsing_book
-    return sanitize_filename(author) + ' -- ' + sanitize_filename(title)
+    return f'{sanitize_filename(author)} -- {sanitize_filename(title)}'
 
 
 def parse_comments(soup):
@@ -45,7 +45,7 @@ def download_book(book_url, book_num, dest_folder):
     link_download = book_url[book_url.find('/b')+2:-1]
     url_download = f'http://tululu.org/txt.php?id={link_download}'
     response = requests.get(url_download, allow_redirects=False)
-    filename = f"{book_num+1}-я книга. {parse_text(soup)}.txt"
+    filename = f"{book_num+1}-я книга. {parse_title_author(soup)}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         return file.write(response.text)
@@ -68,7 +68,7 @@ def parse_urls(start_page, end_page):
 
 
 def parse_info(soup):
-    book_info = parse_text(soup).split(' -- ')
+    book_info = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     url_src = os.path.join(args.dest_folder,
