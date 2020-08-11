@@ -11,7 +11,7 @@ from pathvalidate import sanitize_filename
 def parse_text(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
-    parse_book = (title_tag).text.split(' \xa0 :: \xa0 ')
+    parse_book = title_tag.text.split(' \xa0 :: \xa0 ')
     author, title = parse_book
     return sanitize_filename(author) + ' -- ' + sanitize_filename(title)
 
@@ -72,9 +72,9 @@ def parse_info(soup):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     url_src = os.path.join(args.dest_folder,
-                            'images', url_img.split('/')[-1])
+                           'images', url_img.split('/')[-1])
     book_path = os.path.join(args.dest_folder,
-                                'books', book_info[0] + '.txt')
+                             'books', book_info[0] + '.txt')
     book_info = {
         'title': book_info[0],
         "author": book_info[1],
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books_urls = parse_urls(args.start_page, args.end_page)
     books_info = []
-    for book_num,book_url in enumerate(books_urls):
+    for book_num, book_url in enumerate(books_urls):
         print(book_url)
         response = requests.get(book_url)
         soup = BeautifulSoup(response.text, 'lxml')
