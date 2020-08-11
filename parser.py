@@ -42,12 +42,12 @@ def download_img(url_img, dest_folder):
         return file.write(response.content)
 
 
-def download_book(book_url, book_num, dest_folder):
-    link_download = book_url[book_url.find('/b')+2:-1]
-    url_download = f'http://tululu.org/txt.php?id={link_download}'
+def download_book(book_url, dest_folder):
+    id_dowload = book_url[book_url.find('/b')+2:-1]
+    url_download = f'http://tululu.org/txt.php?id={id_dowload}'
     response = requests.get(url_download, allow_redirects=False)
     response.raise_for_status()
-    filename = f"{book_num+1}-я книга. {parse_title_author(soup)}.txt"
+    filename = f"{id_dowload}-я книга. {parse_title_author(soup)}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         return file.write(response.text)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         books_info.append(parse_info(soup))
 
         if not args.skip_txt:
-            download_book(book_url, book_num, args.dest_folder)
+            download_book(book_url, args.dest_folder)
 
         if not args.skip_imgs:
             download_img(url_img, args.dest_folder)
