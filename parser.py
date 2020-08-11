@@ -11,8 +11,8 @@ from pathvalidate import sanitize_filename
 def parse_text(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
-    parse_book = title_tag.text.split(' \xa0 :: \xa0 ')
-    author, title = parse_book
+    parsing_book = title_tag.text.split(' \xa0 :: \xa0 ')
+    author, title = parsing_book
     return sanitize_filename(author) + ' -- ' + sanitize_filename(title)
 
 
