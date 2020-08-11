@@ -35,6 +35,7 @@ def parse_image(soup):
 
 def download_img(url_img, dest_folder):
     response = requests.get(url_img, allow_redirects=False)
+    response.raise_for_status()
     filename = f"{url_img.split('/')[-1]}"
     folder = os.path.join(dest_folder, 'images', filename)
     with open(folder, "wb") as file:
@@ -45,6 +46,7 @@ def download_book(book_url, book_num, dest_folder):
     link_download = book_url[book_url.find('/b')+2:-1]
     url_download = f'http://tululu.org/txt.php?id={link_download}'
     response = requests.get(url_download, allow_redirects=False)
+    response.raise_for_status()
     filename = f"{book_num+1}-я книга. {parse_title_author(soup)}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
@@ -59,6 +61,7 @@ def parse_urls(start_page, end_page):
     for book_num in range(start_page, end_page):
         book_url = f'http://tululu.org/l55/{book_num}'
         response = requests.get(book_url)
+        response.raise_for_status()
         soup = BeautifulSoup(response.text, 'lxml')
         link_parse = soup.select('table.d_book')
         for link in link_parse:
@@ -126,6 +129,8 @@ if __name__ == '__main__':
     for book_num, book_url in enumerate(books_urls):
         print(book_url)
         response = requests.get(book_url)
+        response.raise_for_status()
+
         soup = BeautifulSoup(response.text, 'lxml')
         url_img = parse_image(soup)
 
