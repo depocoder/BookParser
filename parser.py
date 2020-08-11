@@ -68,16 +68,16 @@ def parse_urls(start_page, end_page):
 
 
 def parse_info(soup):
-    book_info = parse_title_author(soup).split(' -- ')
+    author, title = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     url_src = os.path.join(args.dest_folder,
                            'images', url_img.split('/')[-1])
     book_path = os.path.join(args.dest_folder,
-                             'books', book_info[0] + '.txt')
+                             'books', author + '.txt')
     book_info = {
-        'title': book_info[0],
-        "author": book_info[1],
+        'title': author,
+        "author": title,
         'img_src': url_src,
         'book_path': book_path,
         'comments': comments,
