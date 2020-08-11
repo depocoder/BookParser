@@ -18,17 +18,13 @@ def parse_text(soup):
 
 def parse_comments(soup):
     title_tag = soup.select("div.texts span.black")
-    comments = []
-    for comment in title_tag:
-        comments.append(comment.text)
+    comments = [comment.text for comment in title_tag]
     return comments
 
 
 def parse_genres(soup):
     genres_p = soup.select('span.d_book a')
-    genres = []
-    for genre in genres_p:
-        genres.append(genre.text)
+    genres = [genres.text for genres in genres_p]
     return genres
 
 
