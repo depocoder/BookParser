@@ -14,11 +14,11 @@ pip install -r requirements.txt
 python3 parser.py
 ```
 # Аргументы
-**dest_folder** — путь к каталогу с результатами парсинга: картинкам, книгам, JSON.   
+**dest_folder** — путь к каталогу с результатами парсинга: картинкам, книгам, JSON, путь обязательно указывать в кавычках пример "C:\Program Files".   
 **skip_imgs** — не скачивать картинки.   
 **skip_txt** — не скачивать книги.   
     
 **Запуск кода с аргументами**   
 ```
-python3 parser.py --dest_folder C:/ --skip_imgs      
+python3 parser.py --dest_folder "C:\Program Files" --skip_imgs      
 ```
