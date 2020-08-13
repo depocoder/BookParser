@@ -74,14 +74,12 @@ def parse_info(soup):
     author, title = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    url_src = os.path.join(args.dest_folder,
-                           'images', url_img.split('/')[-1])
-    book_path = os.path.join(args.dest_folder,
-                             'books', author + '.txt')
+    img_src = os.path.join('images', url_img.split('/')[-1])
+    book_path = os.path.join('books', author + '.txt')
     book_info = {
         'title': author,
         "author": title,
-        'img_src': url_src,
+        'img_src': img_src,
         'book_path': book_path,
         'comments': comments,
         "genres": genres
