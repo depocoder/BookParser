@@ -103,10 +103,6 @@ if __name__ == '__main__':
         help='Страница на которой закончится парсинг.', type=int)
 
     parser.add_argument(
-        '--json_path', default='',
-        help='указать свой путь к *.json файлу с результатами.', type=str)
-
-    parser.add_argument(
         '--dest_folder', default=os.getcwd(),
         help='''путь к каталогу с результатами парсинга:
         картинкам, книгам, JSON. ''',
@@ -146,9 +142,6 @@ if __name__ == '__main__':
 
     if args.dest_folder:
         json_path = args.dest_folder
-
-    if args.json_path:
-        json_path = args.json_path
 
     json_path = os.path.join(json_path, "about_books.json")
     with open(json_path, "w", encoding='utf-8') as my_file:
