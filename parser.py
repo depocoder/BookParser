@@ -28,9 +28,9 @@ def parse_genres(soup):
     return genres
 
 
-def parse_image(soup):
+def parse_image(soup, book_url):
     img_src = soup.select_one('div.bookimage img')['src']
-    return urljoin('http://tululu.org', img_src)
+    return urljoin(book_url, img_src)
 
 
 def download_img(url_img, dest_folder):
@@ -59,7 +59,7 @@ def download_book(dest_folder):
 
 
 def parse_urls(start_page, end_page):
-    genre_links = []
+    book_links = []
     end_page += 1
     if start_page > end_page:
         end_page = start_page + 1
@@ -71,8 +71,8 @@ def parse_urls(start_page, end_page):
         link_parse = soup.select('table.d_book')
         for link in link_parse:
             link = link.select_one('a')['href']
-            genre_links.append(urljoin('http://tululu.org', link))
-    return genre_links
+            book_links.append(urljoin(book_url, link))
+    return book_links
 
 
 def parse_info(soup):
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         response.raise_for_status()
 
         soup = BeautifulSoup(response.text, 'lxml')
-        url_img = parse_image(soup)
+        url_img = parse_image(soup, book_url)
 
         books_info.append(parse_info(soup))
 
