@@ -42,8 +42,13 @@ def download_img(url_img, dest_folder):
         return file.write(response.content)
 
 
-def download_book(book_url, dest_folder):
+def get_id_book(book_url):
     id_dowload = book_url[book_url.find('/b')+2:-1]
+    return id_dowload
+
+
+def download_book(dest_folder):
+    id_dowload = get_id_book(book_url)
     url_download = f'http://tululu.org/txt.php?id={id_dowload}'
     response = requests.get(url_download, allow_redirects=False)
     response.raise_for_status()
@@ -71,11 +76,13 @@ def parse_urls(start_page, end_page):
 
 
 def parse_info(soup):
+    id_book = get_id_book(book_url)
     author, title = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    img_src = os.path.join('images', url_img.split('/')[-1])
-    book_path = os.path.join('books', author + '.txt')
+    img_src = os.path.join(
+'images', url_img.split('/')[-1])
+    book_path = os.path.join('books',f"{id_book}-я книга. {parse_title_author(soup)}.txt")
     book_info = {
         'title': author,
         "author": title,
@@ -120,7 +127,7 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books_urls = parse_urls(args.start_page, args.end_page)
     books_info = []
-    for book_num, book_url in enumerate(books_urls):
+    for book_url in books_urls:
         print(book_url)
         response = requests.get(book_url)
         response.raise_for_status()
@@ -131,7 +138,7 @@ if __name__ == '__main__':
         books_info.append(parse_info(soup))
 
         if not args.skip_txt:
-            download_book(book_url, args.dest_folder)
+            download_book(args.dest_folder)
 
         if not args.skip_imgs:
             download_img(url_img, args.dest_folder)
