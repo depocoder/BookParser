@@ -80,9 +80,9 @@ def parse_info(soup):
     author, title = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    img_src = os.path.join(
-'images', url_img.split('/')[-1])
-    book_path = os.path.join('books',f"{id_book}-я книга. {parse_title_author(soup)}.txt")
+    img_src = os.path.join('images', url_img.split('/')[-1])
+    book_path = os.path.join(
+        'books', f"{id_book}-я книга. {parse_title_author(soup)}.txt")
     book_info = {
         'title': author,
         "author": title,
@@ -109,9 +109,9 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--dest_folder', default=os.getcwd(),
-        help='''путь к каталогу с результатами парсинга:
-        картинкам, книгам, JSON. ''',
-        type=str)
+        help='''путь к каталогу с результатами парсинга: картинкам,
+        книгам, JSON, путь обязательно указывать в кавычках
+        пример 'C:/Frogram Files' ''', type=str)
 
     parser.add_argument(
         '--skip_txt', action="store_true",
