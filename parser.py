@@ -8,6 +8,12 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
+def check_redirect(response):
+    if response.status_code == 200:
+        return True
+    return False
+
+
 def parse_title_author(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
@@ -65,13 +71,15 @@ def parse_urls(start_page, end_page):
         end_page = start_page + 1
     for book_num in range(start_page, end_page):
         book_url = f'http://tululu.org/l55/{book_num}'
-        response = requests.get(book_url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'lxml')
-        link_parse = soup.select('table.d_book')
-        for link in link_parse:
-            link = link.select_one('a')['href']
-            book_links.append(urljoin(book_url, link))
+        response = requests.get(book_url, allow_redirects=False)
+        print(type(response.status_code), book_url)
+        if check_redirect(response):
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'lxml')
+            link_parse = soup.select('table.d_book')
+            for link in link_parse:
+                link = link.select_one('a')['href']
+                book_links.append(urljoin(book_url, link))
     return book_links
 
 
@@ -92,12 +100,6 @@ def parse_info(soup):
         "genres": genres
     }
     return book_info
-
-
-def check_redirect(book_url):
-    if response.status_code != 302:
-        return True
-    return False
 
 
 if __name__ == '__main__':
@@ -134,7 +136,6 @@ if __name__ == '__main__':
     books_urls = parse_urls(args.start_page, args.end_page)
     books_info = []
     for book_url in books_urls:
-        print(book_url)
         response = requests.get(book_url, allow_redirects=False)
         response.raise_for_status()
         if check_redirect(book_url):
