@@ -72,7 +72,7 @@ def parse_urls(start_page, end_page):
     for book_num in range(start_page, end_page):
         book_url = f'http://tululu.org/l55/{book_num}'
         response = requests.get(book_url, allow_redirects=False)
-        print(type(response.status_code), book_url)
+        print((response.status_code), book_url)
         if check_redirect(response):
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'lxml')
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     for book_url in books_urls:
         response = requests.get(book_url, allow_redirects=False)
         response.raise_for_status()
-        if check_redirect(book_url):
+        if check_redirect(response):
             soup = BeautifulSoup(response.text, 'lxml')
             url_img = parse_image(soup, book_url)
 
