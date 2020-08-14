@@ -50,7 +50,7 @@ def get_id_book(book_url):
 def download_book(dest_folder):
     id_dowload = get_id_book(book_url)
     url_download = f'http://tululu.org/txt.php?id={id_dowload}'
-    response = requests.get(url_download, allow_redirects=False)
+    response = requests.get(url_download)
     response.raise_for_status()
     filename = f"{id_dowload}-я книга. {parse_title_author(soup)}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
@@ -94,6 +94,12 @@ def parse_info(soup):
     return book_info
 
 
+def check_redirect(book_url):
+    if response.status_code != 302:
+        return True
+    return False
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='''Этот проект позволяет парсить книги
@@ -129,19 +135,19 @@ if __name__ == '__main__':
     books_info = []
     for book_url in books_urls:
         print(book_url)
-        response = requests.get(book_url)
+        response = requests.get(book_url, allow_redirects=False)
         response.raise_for_status()
+        if check_redirect(book_url):
+            soup = BeautifulSoup(response.text, 'lxml')
+            url_img = parse_image(soup, book_url)
 
-        soup = BeautifulSoup(response.text, 'lxml')
-        url_img = parse_image(soup, book_url)
+            books_info.append(parse_info(soup))
 
-        books_info.append(parse_info(soup))
+            if not args.skip_txt:
+                download_book(args.dest_folder)
 
-        if not args.skip_txt:
-            download_book(args.dest_folder)
-
-        if not args.skip_imgs:
-            download_img(url_img, args.dest_folder)
+            if not args.skip_imgs:
+                download_img(url_img, args.dest_folder)
 
     json_path = os.getcwd()
 
