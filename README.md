@@ -16,7 +16,7 @@ source env/bin/activate
 ```
 Установить библиотеки командой.  
 ```
-pip install -r requirements.txt  
+pip3 install -r requirements.txt  
 ``` 
     
 ## Запуск кода.  
