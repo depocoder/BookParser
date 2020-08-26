@@ -29,8 +29,8 @@ def parse_comments(soup):
 
 
 def parse_genres(soup):
-    genres_p = soup.select('span.d_book a')
-    genres = [genres.text for genres in genres_p]
+    genres_soup = soup.select('span.d_book a')
+    genres = [genres.text for genres in genres_soup]
     return genres
 
 
