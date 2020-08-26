@@ -72,7 +72,6 @@ def parse_urls(start_page, end_page):
     for book_num in range(start_page, end_page):
         book_url = f'http://tululu.org/l55/{book_num}'
         response = requests.get(book_url, allow_redirects=False)
-        print((response.status_code), book_url)
         if check_redirect(response):
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'lxml')
