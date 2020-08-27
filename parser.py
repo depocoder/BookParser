@@ -9,7 +9,7 @@ from pathvalidate import sanitize_filename
 
 
 def check_redirect(response):
-    if response.status_code == 200:
+    if response.ok:
         return True
     return False
 
@@ -44,7 +44,7 @@ def download_img(url_img, dest_folder):
     filename = f"{url_img.split('/')[-1]}"
     folder = os.path.join(dest_folder, 'images', filename)
     with open(folder, "wb") as file:
-        return file.write(response.content)
+        return file.write(response.content), filename
 
 
 def get_id_book(book_url):
@@ -60,7 +60,7 @@ def download_book(dest_folder):
     filename = f"{id_dowload}-я книга. {parse_title_author(soup)}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
-        return file.write(response.text)
+        return file.write(response.text), filename
 
 
 def parse_urls(start_page, end_page):
@@ -81,14 +81,13 @@ def parse_urls(start_page, end_page):
     return book_links
 
 
-def parse_info(soup):
+def parse_info(soup, filename_book, filename_img):
     id_book = get_id_book(book_url)
     author, title = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    img_src = os.path.join('images', url_img.split('/')[-1])
-    book_path = os.path.join(
-        'books', f"{id_book}-я книга. {parse_title_author(soup)}.txt")
+    img_src = os.path.join('images', filename_book)
+    book_path = os.path.join('books', filename_img)
     book_info = {
         'title': author,
         "author": title,
@@ -139,14 +138,16 @@ if __name__ == '__main__':
         if check_redirect(response):
             soup = BeautifulSoup(response.text, 'lxml')
             url_img = parse_image(soup, book_url)
-
-            books_info.append(parse_info(soup))
-
+            filename_img = ''
+            filename_book = ''
             if not args.skip_txt:
-                download_book(args.dest_folder)
+                filename_book = download_book(args.dest_folder)[1]
 
             if not args.skip_imgs:
-                download_img(url_img, args.dest_folder)
+                filename_img = download_img(url_img, args.dest_folder)[1]
+
+            books_info.append(parse_info(soup, filename_book, filename_img))
+
 
     json_path = os.getcwd()
 
