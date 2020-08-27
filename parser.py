@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def check_redirect(response):
+def check_redirect_missed(response):
     if response.ok:
         return True
     return False
@@ -71,7 +71,7 @@ def parse_urls(start_page, end_page):
     for book_num in range(start_page, end_page):
         book_url = f'http://tululu.org/l55/{book_num}'
         response = requests.get(book_url, allow_redirects=False)
-        if check_redirect(response):
+        if check_redirect_missed(response):
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'lxml')
             link_parse = soup.select('table.d_book')
@@ -81,8 +81,7 @@ def parse_urls(start_page, end_page):
     return book_links
 
 
-def parse_info(soup, filename_book, filename_img):
-    id_book = get_id_book(book_url)
+def dump_book_details_to_dict(soup, filename_book, filename_img):
     author, title = parse_title_author(soup).split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
@@ -135,7 +134,7 @@ if __name__ == '__main__':
     for book_url in books_urls:
         response = requests.get(book_url, allow_redirects=False)
         response.raise_for_status()
-        if check_redirect(response):
+        if check_redirect_missed(response):
             soup = BeautifulSoup(response.text, 'lxml')
             url_img = parse_image(soup, book_url)
             filename_img = ''
@@ -146,9 +145,8 @@ if __name__ == '__main__':
             if not args.skip_imgs:
                 filename_img = download_img(url_img, args.dest_folder)[1]
 
-            books_info.append(parse_info(soup, filename_book, filename_img))
-
-
+            books_info.append(dump_book_details_to_dict(
+                soup, filename_book, filename_img))
     json_path = os.getcwd()
 
     if args.dest_folder:
