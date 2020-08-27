@@ -17,8 +17,7 @@ def check_redirect(response):
 def parse_title_author(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
-    parsing_book = title_tag.text.split(' \xa0 :: \xa0 ')
-    author, title = parsing_book
+    author, title = title_tag.text.split(' \xa0 :: \xa0 ')
     return f'{sanitize_filename(author)} -- {sanitize_filename(title)}'
 
 
