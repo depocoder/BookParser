@@ -8,9 +8,6 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 
-def check_redirect_missed(response):
-    return response.ok
-
 def parse_title_author(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
@@ -68,7 +65,7 @@ def parse_urls(start_page, end_page):
     for book_num in range(start_page, end_page):
         book_url = f'http://tululu.org/l55/{book_num}'
         response = requests.get(book_url, allow_redirects=False)
-        if check_redirect_missed(response):
+        if response.ok:
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'lxml')
             link_parse = soup.select('table.d_book')
@@ -131,7 +128,7 @@ if __name__ == '__main__':
     for book_url in books_urls:
         response = requests.get(book_url, allow_redirects=False)
         response.raise_for_status()
-        if check_redirect_missed(response):
+        if response.ok:
             soup = BeautifulSoup(response.text, 'lxml')
             url_img = parse_image(soup, book_url)
             filename_img = ''
