@@ -9,10 +9,7 @@ from pathvalidate import sanitize_filename
 
 
 def check_redirect_missed(response):
-    if response.ok:
-        return True
-    return False
-
+    return response.ok
 
 def parse_title_author(soup):
     header = soup.select_one("#content")
