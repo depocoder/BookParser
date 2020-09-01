@@ -124,9 +124,9 @@ if __name__ == '__main__':
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
-    books_urls = parse_urls(args.start_page, args.end_page)
-    books_info = []
     try:
+        books_urls = parse_urls(args.start_page, args.end_page)
+        books_info = []
         for book_url in books_urls:
             response = requests.get(book_url, allow_redirects=False)
             response.raise_for_status()
@@ -144,8 +144,11 @@ if __name__ == '__main__':
                 books_info.append(dump_book_details_to_dict(
                     soup, filename_book, filename_img))
         json_path = os.getcwd()
-    except:
-        sys.stderr.write("fatal error\n")
+    except requests.HTTPError:
+        print('Ошибка - HTTPError')
+        sys.exit()
+    except requests.exceptions.ConnectionError:
+        print('Ошибка - ConnectionError')
         sys.exit()
 
     if args.dest_folder:
