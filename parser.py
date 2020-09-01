@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import json
 from urllib.parse import urljoin
@@ -125,23 +126,27 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books_urls = parse_urls(args.start_page, args.end_page)
     books_info = []
-    for book_url in books_urls:
-        response = requests.get(book_url, allow_redirects=False)
-        response.raise_for_status()
-        if response.ok:
-            soup = BeautifulSoup(response.text, 'lxml')
-            url_img = parse_image(soup, book_url)
-            filename_img = ''
-            filename_book = ''
-            if not args.skip_txt:
-                filename_book = download_book(args.dest_folder)[1]
+    try:
+        for book_url in books_urls:
+            response = requests.get(book_url, allow_redirects=False)
+            response.raise_for_status()
+            if response.ok:
+                soup = BeautifulSoup(response.text, 'lxml')
+                url_img = parse_image(soup, book_url)
+                filename_img = ''
+                filename_book = ''
+                if not args.skip_txt:
+                    filename_book = download_book(args.dest_folder)[1]
 
-            if not args.skip_imgs:
-                filename_img = download_img(url_img, args.dest_folder)[1]
+                if not args.skip_imgs:
+                    filename_img = download_img(url_img, args.dest_folder)[1]
 
-            books_info.append(dump_book_details_to_dict(
-                soup, filename_book, filename_img))
-    json_path = os.getcwd()
+                books_info.append(dump_book_details_to_dict(
+                    soup, filename_book, filename_img))
+        json_path = os.getcwd()
+    except:
+        sys.stderr.write("fatal error\n")
+        sys.exit()
 
     if args.dest_folder:
         json_path = args.dest_folder
