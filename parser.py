@@ -1,5 +1,4 @@
 import os
-import sys
 from time import sleep
 import argparse
 import json
@@ -65,26 +64,27 @@ def parse_urls(start_page, end_page):
     if start_page > end_page:
         end_page = start_page + 1
     for book_num in range(start_page, end_page):
-         while True:
-                try:
-                    book_url = f'http://tululu.org/l55/{book_num}'
-                    response = requests.get(book_url, allow_redirects=False)
-                    raise_if_redirect(response)
-                    response.raise_for_status()
-                    soup = BeautifulSoup(response.text, 'lxml')
-                    link_parse = soup.select('table.d_book')
-                    for link in link_parse:
-                        link = link.select_one('a')['href']
-                        book_links.append(urljoin(book_url, link))
-                except Exception as requestsHTTPError:
-                    print(f'Ошибка - HTTPError, пропуск номера книги - {book_num}')
-                    break
-                except requests.exceptions.ConnectionError:
-                    print('Ошибка - ConnectionError.', 
-                    'Проверьте подключение с интернетом.',
-                    ' Запуск повторно через 30 секунд.')
-                    continue
+        while True:
+            try:
+                book_url = f'http://tululu.org/l55/{book_num}'
+                response = requests.get(book_url, allow_redirects=False)
+                raise_if_redirect(response)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.text, 'lxml')
+                link_parse = soup.select('table.d_book')
+                for link in link_parse:
+                    link = link.select_one('a')['href']
+                    book_links.append(urljoin(book_url, link))
+            except requests.exceptions.ConnectionError:
+                print('Ошибка - ConnectionError.',
+                      'Проверьте подключение с интернетом.',
+                      ' Запуск повторно через 30 секунд.')
+                sleep(30)
+                continue
+            except Exception as requestsHTTPError:
+                print(f'Ошибка - HTTPError, пропуск номера книги - {book_num}')
                 break
+            break
     return book_links
 
 
@@ -160,13 +160,14 @@ if __name__ == '__main__':
                     filename_img = download_img(url_img, args.dest_folder)[1]
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
-                'Проверьте подключение с интернетом.',
-                'Запуск повторно через 30 секунд.')
+                      'Проверьте подключение с интернетом.',
+                      'Запуск повторно через 30 секунд.')
                 sleep(30)
                 continue
             except Exception as requestsHTTPError:
                 print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
                 break
+            break
         books_info.append(dump_book_details_to_dict(
             soup, filename_book, filename_img))
 
