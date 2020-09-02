@@ -1,5 +1,6 @@
 import os
 import sys
+from time import sleep
 import argparse
 import json
 from urllib.parse import urljoin
@@ -64,20 +65,31 @@ def parse_urls(start_page, end_page):
     if start_page > end_page:
         end_page = start_page + 1
     for book_num in range(start_page, end_page):
-        book_url = f'http://tululu.org/l55/{book_num}'
-        response = requests.get(book_url, allow_redirects=False)
-        raise_if_redirect(response)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'lxml')
-        link_parse = soup.select('table.d_book')
-        for link in link_parse:
-            link = link.select_one('a')['href']
-            book_links.append(urljoin(book_url, link))
+         while True:
+                try:
+                    book_url = f'http://tululu.org/l55/{book_num}'
+                    response = requests.get(book_url, allow_redirects=False)
+                    raise_if_redirect(response)
+                    response.raise_for_status()
+                    soup = BeautifulSoup(response.text, 'lxml')
+                    link_parse = soup.select('table.d_book')
+                    for link in link_parse:
+                        link = link.select_one('a')['href']
+                        book_links.append(urljoin(book_url, link))
+                except Exception as requestsHTTPError:
+                    print(f'Ошибка - HTTPError, пропуск номера книги - {book_num}')
+                    break
+                except requests.exceptions.ConnectionError:
+                    print('Ошибка - ConnectionError.', 
+                    'Проверьте подключение с интернетом.',
+                    ' Запуск повторно через 30 секунд.')
+                    continue
+                break
     return book_links
 
 
 def dump_book_details_to_dict(soup, filename_book, filename_img):
-    author, title = parse_title_author(soup).split(' -- ')
+    author, title = filename_book.split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     img_src = os.path.join('images', filename_book)
@@ -130,32 +142,35 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books_info = []
-    try:
-        books_urls = parse_urls(args.start_page, args.end_page)
-        for book_url in books_urls:
-            response = requests.get(book_url, allow_redirects=False)
-            raise_if_redirect(response)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'lxml')
-            url_img = parse_image(soup, book_url)
-            filename_img = ''
-            filename_book = ''
-            if not args.skip_txt:
-                filename_book = download_book(args.dest_folder)[1]
+    books_urls = parse_urls(args.start_page, args.end_page)
+    for book_url in books_urls:
+        while True:
+            try:
+                response = requests.get(book_url, allow_redirects=False)
+                raise_if_redirect(response)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.text, 'lxml')
+                url_img = parse_image(soup, book_url)
+                filename_img = ''
+                filename_book = ''
+                if not args.skip_txt:
+                    filename_book = download_book(args.dest_folder)[1]
 
-            if not args.skip_imgs:
-                filename_img = download_img(url_img, args.dest_folder)[1]
+                if not args.skip_imgs:
+                    filename_img = download_img(url_img, args.dest_folder)[1]
+            except requests.exceptions.ConnectionError:
+                print('Ошибка - ConnectionError.',
+                'Проверьте подключение с интернетом.',
+                'Запуск повторно через 30 секунд.')
+                sleep(30)
+                continue
+            except Exception as requestsHTTPError:
+                print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
+                break
+        books_info.append(dump_book_details_to_dict(
+            soup, filename_book, filename_img))
 
-            books_info.append(dump_book_details_to_dict(
-                soup, filename_book, filename_img))
-        json_path = os.getcwd()
-    except Exception as requestsHTTPError:
-        print('Ошибка - HTTPError')
-        sys.exit()
-    except requests.exceptions.ConnectionError:
-        print('Ошибка - ConnectionError')
-        sys.exit()
-
+    json_path = os.getcwd()
     if args.dest_folder:
         json_path = args.dest_folder
 
