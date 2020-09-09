@@ -52,10 +52,12 @@ def download_book(dest_folder):
     url_download = f'http://tululu.org/txt.php?id={id_dowload}'
     response = requests.get(url_download)
     response.raise_for_status()
-    filename = f"{id_dowload}-я книга. {parse_title_author(soup)}.txt"
+    author_and_title = parse_title_author(soup)
+    filename = f"{id_dowload}-я книга. {author_and_title}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
-        return file.write(response.text), filename
+        file.write(response.text)
+        return author_and_title
 
 
 def parse_urls(start_page, end_page):
@@ -88,14 +90,15 @@ def parse_urls(start_page, end_page):
     return book_links
 
 
-def dump_book_details_to_dict(soup, filename_book, filename_img):
-    author, title = filename_book.split(' -- ')
+def dump_book_details_to_dict(soup, author_and_title, filename_img):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    if filename_book is None:
-        book_path = None
+    if author_and_title is None:
+        author, title, book_path = None, None, None
     else:
-        book_path = os.path.join('images', filename_book)
+        book_path = os.path.join('images', author_and_title)
+        author, title = author_and_title.split(' -- ')
+
     if filename_img is None:
         img_src = None
     else:
@@ -158,9 +161,9 @@ if __name__ == '__main__':
                 soup = BeautifulSoup(response.text, 'lxml')
                 url_img = parse_image(soup, book_url)
                 filename_img = None
-                filename_book = None
+                author_and_title = None
                 if not args.skip_txt:
-                    filename_book = download_book(args.dest_folder)[1]
+                    author_and_title = download_book(args.dest_folder)
 
                 if not args.skip_imgs:
                     filename_img = download_img(url_img, args.dest_folder)[1]
@@ -175,7 +178,7 @@ if __name__ == '__main__':
                 break
             break
         books_info.append(dump_book_details_to_dict(
-            soup, filename_book, filename_img))
+            soup, author_and_title, filename_img))
 
     json_path = os.getcwd()
     if args.dest_folder:
