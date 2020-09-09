@@ -92,8 +92,14 @@ def dump_book_details_to_dict(soup, filename_book, filename_img):
     author, title = filename_book.split(' -- ')
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    img_src = os.path.join('images', filename_book)
-    book_path = os.path.join('books', filename_img)
+    if filename_book is None:
+        book_path = None
+    else:
+        book_path = os.path.join('images', filename_book)
+    if filename_img is None:
+        img_src = None
+    else:
+        img_src = os.path.join('books', filename_img)
     book_info = {
         'title': author,
         "author": title,
@@ -151,8 +157,8 @@ if __name__ == '__main__':
                 response.raise_for_status()
                 soup = BeautifulSoup(response.text, 'lxml')
                 url_img = parse_image(soup, book_url)
-                filename_img = ''
-                filename_book = ''
+                filename_img = None
+                filename_book = None
                 if not args.skip_txt:
                     filename_book = download_book(args.dest_folder)[1]
 
