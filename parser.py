@@ -83,7 +83,7 @@ def parse_urls(start_page, end_page):
                       ' Запуск повторно через 30 секунд.')
                 sleep(30)
                 continue
-            except Exception as requestsHTTPError:
+            except requests.HTTPError:
                 print(f'Ошибка - HTTPError, пропуск номера книги - {book_num}')
                 break
             break
@@ -116,7 +116,7 @@ def dump_book_details_to_dict(soup, author_and_title, filename_img):
 
 def raise_if_redirect(response):
     if response.status_code == 302:
-        return requestsHTTPError
+        raise requests.HTTPError
 
 
 if __name__ == '__main__':
@@ -173,12 +173,12 @@ if __name__ == '__main__':
                       'Запуск повторно через 30 секунд.')
                 sleep(30)
                 continue
-            except Exception as requestsHTTPError:
+            except requests.HTTPError:
                 print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
                 break
+            books_info.append(dump_book_details_to_dict(
+                soup, author_and_title, filename_img))
             break
-        books_info.append(dump_book_details_to_dict(
-            soup, author_and_title, filename_img))
 
     json_path = os.getcwd()
     if args.dest_folder:
