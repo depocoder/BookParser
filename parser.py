@@ -52,12 +52,12 @@ def download_book(dest_folder):
     url_download = f'http://tululu.org/txt.php?id={id_dowload}'
     response = requests.get(url_download)
     response.raise_for_status()
-    author_and_title = parse_title_author(soup)
-    filename = f"{id_dowload}-я книга. {author_and_title}.txt"
+    book_author_and_title = parse_title_author(soup)
+    filename = f"{id_dowload}-я книга. {book_author_and_title}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         file.write(response.text)
-        return author_and_title
+        return book_author_and_title
 
 
 def parse_urls(start_page, end_page):
@@ -90,19 +90,19 @@ def parse_urls(start_page, end_page):
     return book_links
 
 
-def dump_book_details_to_dict(soup, author_and_title, filename_img):
+def dump_book_details_to_dict(soup, book_author_and_title, img_filename):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    if author_and_title is None:
+    if book_author_and_title is None:
         author, title, book_path = None, None, None
     else:
-        book_path = os.path.join('images', author_and_title)
-        author, title = author_and_title.split(' -- ')
+        book_path = os.path.join('books', (book_author_and_title + '.txt'))
+        author, title = book_author_and_title.split(' -- ')
 
-    if filename_img is None:
+    if img_filename is None:
         img_src = None
     else:
-        img_src = os.path.join('books', filename_img)
+        img_src = os.path.join('images', img_filename)
     book_info = {
         'title': author,
         "author": title,
@@ -160,13 +160,13 @@ if __name__ == '__main__':
                 response.raise_for_status()
                 soup = BeautifulSoup(response.text, 'lxml')
                 url_img = parse_image(soup, book_url)
-                filename_img = None
-                author_and_title = None
+                img_filename = None
+                book_author_and_title = None
                 if not args.skip_txt:
-                    author_and_title = download_book(args.dest_folder)
+                    book_author_and_title = download_book(args.dest_folder)
 
                 if not args.skip_imgs:
-                    filename_img = download_img(url_img, args.dest_folder)[1]
+                    img_filename = download_img(url_img, args.dest_folder)[1]
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
@@ -177,7 +177,7 @@ if __name__ == '__main__':
                 print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
                 break
             books_info.append(dump_book_details_to_dict(
-                soup, author_and_title, filename_img))
+                soup, book_author_and_title, img_filename))
             break
 
     json_path = os.getcwd()
