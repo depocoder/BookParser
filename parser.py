@@ -4,7 +4,9 @@ import argparse
 import json
 from urllib.parse import urljoin
 from pathlib import Path
+
 import requests
+
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
