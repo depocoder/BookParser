@@ -1,12 +1,12 @@
 import os
-from time import sleep
 import argparse
 import json
-from urllib.parse import urljoin
-from pathlib import Path
 
 import requests
 
+from pathlib import Path
+from urllib.parse import urljoin
+from time import sleep
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
