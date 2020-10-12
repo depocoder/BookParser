@@ -1,12 +1,11 @@
 import os
 import argparse
 import json
-
-import requests
-
 from pathlib import Path
 from urllib.parse import urljoin
 from time import sleep
+
+import requests
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
@@ -15,7 +14,7 @@ def parse_title_author(soup):
     header = soup.select_one("#content")
     title_tag = header.h1
     author, title = title_tag.text.split(' \xa0 :: \xa0 ')
-    return f'{sanitize_filename(author)} -- {sanitize_filename(title)}'
+    return sanitize_filename(author), sanitize_filename(title)
 
 
 def parse_comments(soup):
@@ -51,15 +50,13 @@ def get_id_book(book_url):
 
 def download_book(dest_folder):
     id_dowload = get_id_book(book_url)
-    url_download = f'http://tululu.org/txt.php?id={id_dowload}'
+    url_download = f'https://tululu.org/txt.php?id={id_dowload}'
     response = requests.get(url_download)
     response.raise_for_status()
-    book_author_and_title = parse_title_author(soup)
-    filename = f"{id_dowload}-я книга. {book_author_and_title}.txt"
+    filename = f"{id_dowload}-я книга. {book_title} -- {author_book}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         file.write(response.text)
-        return book_author_and_title
 
 
 def parse_urls(start_page, end_page):
@@ -70,7 +67,7 @@ def parse_urls(start_page, end_page):
     for book_num in range(start_page, end_page):
         while True:
             try:
-                book_url = f'http://tululu.org/l55/{book_num}'
+                book_url = f'https://tululu.org/l55/{book_num}'
                 response = requests.get(book_url, allow_redirects=False)
                 raise_if_redirect(response)
                 response.raise_for_status()
@@ -92,22 +89,21 @@ def parse_urls(start_page, end_page):
     return book_links
 
 
-def dump_book_details_to_dict(soup, book_author_and_title, img_filename):
+def dump_book_details_to_dict(soup, book_title, author_book, img_filename):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    if book_author_and_title is None:
-        author, title, book_path = None, None, None
+    if author_book is None and book_title is None:
+        author_book, book_title, book_path = None, None, None
     else:
-        book_path = os.path.join('books', (book_author_and_title + '.txt'))
-        author, title = book_author_and_title.split(' -- ')
+        book_path = os.path.join('books', (f'{book_title} -- {author_book}' + '.txt'))
 
     if img_filename is None:
         img_src = None
     else:
         img_src = os.path.join('images', img_filename)
     book_info = {
-        'title': author,
-        "author": title,
+        'title': book_title,
+        "author": author_book,
         'img_src': img_src,
         'book_path': book_path,
         'comments': comments,
@@ -163,9 +159,11 @@ if __name__ == '__main__':
                 soup = BeautifulSoup(response.text, 'lxml')
                 url_img = parse_image(soup, book_url)
                 img_filename = None
-                book_author_and_title = None
+                book_title = None
+                author_book = None
                 if not args.skip_txt:
-                    book_author_and_title = download_book(args.dest_folder)
+                    book_title, author_book  = parse_title_author(soup)
+                    #author = download_book(args.dest_folder)
 
                 if not args.skip_imgs:
                     img_filename = download_img(url_img, args.dest_folder)[1]
@@ -179,7 +177,7 @@ if __name__ == '__main__':
                 print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
                 break
             books_info.append(dump_book_details_to_dict(
-                soup, book_author_and_title, img_filename))
+                soup, book_title, author_book, img_filename))
             break
 
     json_path = os.getcwd()
