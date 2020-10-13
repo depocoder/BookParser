@@ -45,15 +45,15 @@ def download_img(url_img, dest_folder):
 
 
 def get_id_book(book_url):
-    id_dowload = book_url[book_url.find('/b')+2:-1]
-    return id_dowload
+    id_download = book_url[book_url.find('/b')+2:-1]
+    return id_download
 
 
-def download_book(dest_folder, id_dowload):
+def download_book(dest_folder, id_download):
     response = requests.get("https://tululu.org/txt.php", params={
-        "id": id_dowload,})
+        "id": id_download,})
     response.raise_for_status()
-    filename = f"{id_dowload}-я книга. {book_title}.txt"
+    filename = f"{id_download}-я книга. {book_title}.txt"
     book_path = os.path.join(dest_folder, 'books', filename)
     with open(book_path, "w", encoding='utf-8') as file:
         file.write(response.text)
@@ -90,13 +90,13 @@ def parse_urls(start_page, end_page):
 
 
 def dump_book_details_to_dict(
-    soup, book_title, author_book, img_filename, id_dowload):
+    soup, book_title, author_book, img_filename, id_download):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     if author_book is None and book_title is None:
         author_book, book_title, book_path = None, None, None
     else:
-        book_path = os.path.join('books', (f'{id_dowload}-я книга. {book_title}.txt'))
+        book_path = os.path.join('books', (f'{id_download}-я книга. {book_title}.txt'))
 
     if img_filename is None:
         img_src = None
@@ -164,8 +164,8 @@ if __name__ == '__main__':
                 author_book = None
                 if not args.skip_txt:
                     book_title, author_book  = parse_title_author(soup)
-                    id_dowload = get_id_book(book_url)
-                    download_book(args.dest_folder, id_dowload)
+                    id_download = get_id_book(book_url)
+                    download_book(args.dest_folder, id_download)
 
                 if not args.skip_imgs:
                     img_filename = download_img(url_img, args.dest_folder)[1]
@@ -179,7 +179,7 @@ if __name__ == '__main__':
                 print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
                 break
             books_info.append(dump_book_details_to_dict(
-                soup, book_title, author_book, img_filename, id_dowload))
+                soup, book_title, author_book, img_filename, id_download))
             break
 
     json_path = os.getcwd()
