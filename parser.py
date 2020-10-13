@@ -119,6 +119,13 @@ def raise_if_redirect(response):
         raise requests.HTTPError
 
 
+def get_book_soup(book_url):
+    response = requests.get(book_url, allow_redirects=False)
+    raise_if_redirect(response)
+    response.raise_for_status()
+    return BeautifulSoup(response.text, 'lxml')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='''Этот проект позволяет парсить книги
@@ -155,11 +162,7 @@ if __name__ == '__main__':
     for book_url in books_urls:
         while True:
             try:
-                response = requests.get(book_url, allow_redirects=False)
-                raise_if_redirect(response)
-                response.raise_for_status()
-                soup = BeautifulSoup(response.text, 'lxml')
-                url_img = parse_image(soup, book_url)
+                soup = get_book_soup(book_url)
                 img_filename = None
                 book_title = None
                 author_book = None
@@ -169,6 +172,7 @@ if __name__ == '__main__':
                     download_book(args.dest_folder, id_download)
 
                 if not args.skip_imgs:
+                    url_img = parse_image(soup, book_url)
                     img_filename = download_img(url_img, args.dest_folder)
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
