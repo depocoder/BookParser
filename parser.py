@@ -51,8 +51,8 @@ def get_id_book(book_url):
 
 def download_book(dest_folder):
     id_dowload = get_id_book(book_url)
-    url_download = f'https://tululu.org/txt.php?id={id_dowload}'
-    response = requests.get(url_download)
+    response = requests.get("https://tululu.org/txt.php", params={
+        "id": id_dowload,})
     response.raise_for_status()
     filename = f"{id_dowload}-я книга. {book_title} -- {author_book}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
@@ -65,10 +65,10 @@ def parse_urls(start_page, end_page):
     end_page += 1
     if start_page > end_page:
         end_page = start_page + 1
-    for book_num in range(start_page, end_page):
+    for page_book in range(start_page, end_page):
         while True:
             try:
-                book_url = f'https://tululu.org/l55/{book_num}'
+                book_url = f'https://tululu.org/l55/{page_book}'
                 response = requests.get(book_url, allow_redirects=False)
                 raise_if_redirect(response)
                 response.raise_for_status()
@@ -84,7 +84,7 @@ def parse_urls(start_page, end_page):
                 sleep(30)
                 continue
             except requests.HTTPError:
-                print(f'Ошибка - HTTPError, пропуск номера книги - {book_num}')
+                print(f'Ошибка - HTTPError, пропуск номера страницы - {page_book}')
                 break
             break
     return book_links
@@ -164,7 +164,7 @@ if __name__ == '__main__':
                 author_book = None
                 if not args.skip_txt:
                     book_title, author_book  = parse_title_author(soup)
-                    #author = download_book(args.dest_folder)
+                    download_book(args.dest_folder)
 
                 if not args.skip_imgs:
                     img_filename = download_img(url_img, args.dest_folder)[1]
