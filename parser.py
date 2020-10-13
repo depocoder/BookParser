@@ -41,7 +41,8 @@ def download_img(url_img, dest_folder):
     filename, file_ext = os.path.splitext(os.path.basename(disassembled_url.path))
     image_path = os.path.join(dest_folder, 'images', filename + file_ext)
     with open(image_path, "wb") as file:
-        return file.write(response.content), filename
+        file.write(response.content)
+    return filename
 
 
 def get_id_book(book_url):
@@ -168,7 +169,7 @@ if __name__ == '__main__':
                     download_book(args.dest_folder, id_download)
 
                 if not args.skip_imgs:
-                    img_filename = download_img(url_img, args.dest_folder)[1]
+                    img_filename = download_img(url_img, args.dest_folder)
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
