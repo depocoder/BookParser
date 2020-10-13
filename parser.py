@@ -39,7 +39,8 @@ def download_img(url_img, dest_folder):
     response = requests.get(url_img, allow_redirects=False)
     response.raise_for_status()
     disassembled_url = urlparse(url_img)
-    filename, file_ext = os.path.splitext(os.path.basename(disassembled_url.path))
+    filename, file_ext = os.path.splitext(
+        os.path.basename(disassembled_url.path))
     image_path = os.path.join(dest_folder, 'images', filename + file_ext)
     with open(image_path, "wb") as file:
         file.write(response.content)
@@ -53,7 +54,7 @@ def get_id_book(book_url):
 
 def download_book(dest_folder, id_download):
     response = requests.get("https://tululu.org/txt.php", params={
-        "id": id_download,})
+        "id": id_download, })
     response.raise_for_status()
     filename = f"{id_download}-я книга. {book_title}.txt"
     book_path = os.path.join(dest_folder, 'books', filename)
@@ -89,10 +90,11 @@ def parse_urls(start_page, end_page):
 
 
 def dump_book_details_to_dict(
-    soup, book_title, author_book, img_filename, id_download):
+        soup, book_title, author_book, img_filename, id_download):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    book_path = os.path.join('books', (f'{id_download}-я книга. {book_title}.txt'))
+    book_path = os.path.join('books', (
+        f'{id_download}-я книга. {book_title}.txt'))
     img_src = os.path.join('images', img_filename + img_ext)
     book_info = {
         'title': book_title,
@@ -128,7 +130,8 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--end_page',
-        help='Страница на которой закончится парсинг.', required=True, type=int)
+        help='Страница на которой закончится парсинг.',
+        required=True, type=int)
 
     parser.add_argument(
         '--dest_folder', default=os.getcwd(),
@@ -149,8 +152,8 @@ if __name__ == '__main__':
     start_page = args.start_page
     if not (start_page < end_page and start_page > 0 and end_page > 0):
         sys.exit(
-            'Не верный ввод start_page или end_page, '+
-            'пример правильного ввода:'+
+            'Не верный ввод start_page или end_page, ' +
+            'пример правильного ввода:' +
             '\n' + 'python3 parser.py --start_page 3 --end_page 10')
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
@@ -162,13 +165,14 @@ if __name__ == '__main__':
             try:
                 soup = get_book_soup(book_url)
                 if not args.skip_txt:
-                    book_title, author_book  = parse_title_author(soup)
+                    book_title, author_book = parse_title_author(soup)
                     id_download = get_id_book(book_url)
                     download_book(args.dest_folder, id_download)
 
                 if not args.skip_imgs:
                     url_img = parse_image(soup, book_url)
-                    img_filename, img_ext = download_img(url_img, args.dest_folder)
+                    img_filename, img_ext = download_img(
+                        url_img, args.dest_folder)
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
