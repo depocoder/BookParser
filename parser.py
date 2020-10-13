@@ -2,7 +2,7 @@ import os
 import argparse
 import json
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from time import sleep
 
 import requests
@@ -37,8 +37,9 @@ def parse_image(soup, book_url):
 def download_img(url_img, dest_folder):
     response = requests.get(url_img, allow_redirects=False)
     response.raise_for_status()
-    filename = f"{url_img.split('/')[-1]}"
-    folder = os.path.join(dest_folder, 'images', filename)
+    disassembled_url = urlparse(url_img)
+    filename, file_ext = os.path.splitext(os.path.basename(disassembled_url.path))
+    folder = os.path.join(dest_folder, 'images', filename + file_ext)
     with open(folder, "wb") as file:
         return file.write(response.content), filename
 
