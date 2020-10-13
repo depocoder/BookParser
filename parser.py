@@ -49,12 +49,11 @@ def get_id_book(book_url):
     return id_dowload
 
 
-def download_book(dest_folder):
-    id_dowload = get_id_book(book_url)
+def download_book(dest_folder, id_dowload):
     response = requests.get("https://tululu.org/txt.php", params={
         "id": id_dowload,})
     response.raise_for_status()
-    filename = f"{id_dowload}-я книга. {book_title} -- {author_book}.txt"
+    filename = f"{id_dowload}-я книга. {book_title}.txt"
     folder = os.path.join(dest_folder, 'books', filename)
     with open(folder, "w", encoding='utf-8') as file:
         file.write(response.text)
@@ -90,13 +89,14 @@ def parse_urls(start_page, end_page):
     return book_links
 
 
-def dump_book_details_to_dict(soup, book_title, author_book, img_filename):
+def dump_book_details_to_dict(
+    soup, book_title, author_book, img_filename, id_dowload):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     if author_book is None and book_title is None:
         author_book, book_title, book_path = None, None, None
     else:
-        book_path = os.path.join('books', (f'{book_title} -- {author_book}' + '.txt'))
+        book_path = os.path.join('books', (f'{id_dowload}-я книга. {book_title}.txt'))
 
     if img_filename is None:
         img_src = None
@@ -164,7 +164,8 @@ if __name__ == '__main__':
                 author_book = None
                 if not args.skip_txt:
                     book_title, author_book  = parse_title_author(soup)
-                    download_book(args.dest_folder)
+                    id_dowload = get_id_book(book_url)
+                    download_book(args.dest_folder, id_dowload)
 
                 if not args.skip_imgs:
                     img_filename = download_img(url_img, args.dest_folder)[1]
@@ -178,7 +179,7 @@ if __name__ == '__main__':
                 print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
                 break
             books_info.append(dump_book_details_to_dict(
-                soup, book_title, author_book, img_filename))
+                soup, book_title, author_book, img_filename, id_dowload))
             break
 
     json_path = os.getcwd()
