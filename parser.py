@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import json
 from pathlib import Path
@@ -62,10 +63,7 @@ def download_book(dest_folder, id_download):
 
 def parse_urls(start_page, end_page):
     book_links = []
-    end_page += 1
-    if start_page > end_page:
-        end_page = start_page + 1
-    for page_book in range(start_page, end_page):
+    for page_book in range(start_page, end_page + 1):
         while True:
             try:
                 book_url = f'https://tululu.org/l55/{page_book}'
@@ -154,11 +152,18 @@ if __name__ == '__main__':
         help='не скачивать картинки.')
 
     args = parser.parse_args()
+    end_page = args.end_page
+    start_page = args.start_page
+    if not (start_page < end_page and start_page > 0 and end_page > 0):
+        sys.exit(
+            'Не верный ввод start_page или end_page, '+
+            'пример правильного ввода:'+
+            '\n' + 'python3 parser.py --start_page 3 --end_page 10')
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books_info = []
-    books_urls = parse_urls(args.start_page, args.end_page)
+    books_urls = parse_urls(start_page, end_page)
     for book_url in books_urls:
         while True:
             try:
