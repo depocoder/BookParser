@@ -39,8 +39,8 @@ def download_img(url_img, dest_folder):
     response.raise_for_status()
     disassembled_url = urlparse(url_img)
     filename, file_ext = os.path.splitext(os.path.basename(disassembled_url.path))
-    folder = os.path.join(dest_folder, 'images', filename + file_ext)
-    with open(folder, "wb") as file:
+    image_path = os.path.join(dest_folder, 'images', filename + file_ext)
+    with open(image_path, "wb") as file:
         return file.write(response.content), filename
 
 
@@ -54,8 +54,8 @@ def download_book(dest_folder, id_dowload):
         "id": id_dowload,})
     response.raise_for_status()
     filename = f"{id_dowload}-я книга. {book_title}.txt"
-    folder = os.path.join(dest_folder, 'books', filename)
-    with open(folder, "w", encoding='utf-8') as file:
+    book_path = os.path.join(dest_folder, 'books', filename)
+    with open(book_path, "w", encoding='utf-8') as file:
         file.write(response.text)
 
 
