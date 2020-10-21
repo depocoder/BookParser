@@ -83,7 +83,8 @@ def parse_urls(start_page, end_page):
                 sleep(30)
                 continue
             except requests.HTTPError:
-                print(f'Ошибка - HTTPError, пропуск номера страницы - {page_book}')
+                print('Ошибка - HTTPError, пропуск номера страницы -',
+                      page_book)
                 break
             break
     return book_links
@@ -121,8 +122,8 @@ def get_book_soup(book_url):
 
 def create_argparse():
     parser = argparse.ArgumentParser(
-    description='''Этот проект позволяет парсить книги
-    из открытого доступа.''')
+        description='''Этот проект позволяет парсить книги
+        из открытого доступа.''')
 
     parser.add_argument(
         '--start_page',
