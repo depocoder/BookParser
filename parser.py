@@ -62,7 +62,7 @@ def download_book(dest_folder, download_id):
         file.write(response.text)
 
 
-def parse_urls(start_page, end_page):
+def parse_books_urls(start_page, end_page):
     book_links = []
     for page_book in range(start_page, end_page + 1):
         while True:
@@ -163,8 +163,8 @@ if __name__ == '__main__':
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
-    books_info = []
-    books_urls = parse_urls(start_page, end_page)
+    books = []
+    books_urls = parse_books_urls(start_page, end_page)
     for url_book in books_urls:
         while True:
             try:
@@ -188,7 +188,7 @@ if __name__ == '__main__':
                 print(f'Ошибка - HTTPError, пропуск книги - {url_book}')
                 break
             if not args.skip_txt and not args.skip_imgs:
-                books_info.append(dump_book_details_to_dict(
+                books.append(dump_book_details_to_dict(
                     soup, title_book, author_book, img_filename, download_id))
             break
 
@@ -198,4 +198,4 @@ if __name__ == '__main__':
     if not args.skip_txt and not args.skip_imgs:
         json_path = os.path.join(json_path, "about_books.json")
         with open(json_path, "w", encoding='utf-8') as my_file:
-            json.dump(books_info, my_file, indent=4, ensure_ascii=False)
+            json.dump(books, my_file, indent=4, ensure_ascii=False)
