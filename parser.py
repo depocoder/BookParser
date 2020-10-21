@@ -147,19 +147,22 @@ def create_argparse():
     parser.add_argument(
         '--skip_imgs', action="store_true",
         help='не скачивать картинки.')
-
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
-    args = create_argparse()
-    end_page = args.end_page
-    start_page = args.start_page
-    if not (start_page < end_page and start_page > 0 and end_page > 0):
+    args = parser.parse_args()
+    if not (args.start_page < args.end_page and args.start_page > 0
+            and args.end_page > 0):
         sys.exit(
             'Не верный ввод start_page или end_page, ' +
             'пример правильного ввода:' +
             '\n' + 'python3 parser.py --start_page 3 --end_page 10')
+
+    return parser
+
+
+if __name__ == '__main__':
+    parser = create_argparse()
+    args = parser.parse_args()
+    end_page = args.end_page
+    start_page = args.start_page
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
