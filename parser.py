@@ -119,10 +119,10 @@ def get_book_soup(book_url):
     return BeautifulSoup(response.text, 'lxml')
 
 
-if __name__ == '__main__':
+def create_argparse():
     parser = argparse.ArgumentParser(
-        description='''Этот проект позволяет парсить книги
-        из открытого доступа.''')
+    description='''Этот проект позволяет парсить книги
+    из открытого доступа.''')
 
     parser.add_argument(
         '--start_page',
@@ -147,7 +147,11 @@ if __name__ == '__main__':
         '--skip_imgs', action="store_true",
         help='не скачивать картинки.')
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    args = create_argparse()
     end_page = args.end_page
     start_page = args.start_page
     if not (start_page < end_page and start_page > 0 and end_page > 0):
