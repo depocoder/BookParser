@@ -30,9 +30,9 @@ def parse_genres(soup):
     return genres
 
 
-def parse_image(soup, book_url):
+def parse_image(soup, url_book):
     img_src = soup.select_one('div.bookimage img')['src']
-    return urljoin(book_url, img_src)
+    return urljoin(url_book, img_src)
 
 
 def download_img(url_img, dest_folder):
@@ -47,16 +47,16 @@ def download_img(url_img, dest_folder):
     return filename, file_ext
 
 
-def get_id_book(book_url):
-    id_download = book_url[book_url.find('/b')+2:-1]
-    return id_download
+def get_id_book(url_book):
+    download_id = url_book[url_book.find('/b')+2:-1]
+    return download_id
 
 
-def download_book(dest_folder, id_download):
+def download_book(dest_folder, download_id):
     response = requests.get("https://tululu.org/txt.php", params={
-        "id": id_download, })
+        "id": download_id, })
     response.raise_for_status()
-    filename = f"{id_download}-я книга. {book_title}.txt"
+    filename = f"{download_id}-я книга. {title_book}.txt"
     book_path = os.path.join(dest_folder, 'books', filename)
     with open(book_path, "w", encoding='utf-8') as file:
         file.write(response.text)
@@ -67,15 +67,15 @@ def parse_urls(start_page, end_page):
     for page_book in range(start_page, end_page + 1):
         while True:
             try:
-                book_url = f'https://tululu.org/l55/{page_book}'
-                response = requests.get(book_url, allow_redirects=False)
+                url_book = f'https://tululu.org/l55/{page_book}'
+                response = requests.get(url_book, allow_redirects=False)
                 raise_if_redirect(response)
                 response.raise_for_status()
                 soup = BeautifulSoup(response.text, 'lxml')
                 link_parse = soup.select('table.d_book')
                 for link in link_parse:
                     link = link.select_one('a')['href']
-                    book_links.append(urljoin(book_url, link))
+                    book_links.append(urljoin(url_book, link))
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
@@ -91,14 +91,14 @@ def parse_urls(start_page, end_page):
 
 
 def dump_book_details_to_dict(
-        soup, book_title, author_book, img_filename, id_download):
+        soup, title_book, author_book, img_filename, download_id):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
     book_path = os.path.join('books', (
-        f'{id_download}-я книга. {book_title}.txt'))
+        f'{download_id}-я книга. {title_book}.txt'))
     img_src = os.path.join('images', img_filename + img_ext)
     book_info = {
-        'title': book_title,
+        'title': title_book,
         "author": author_book,
         'img_src': img_src,
         'book_path': book_path,
@@ -113,8 +113,8 @@ def raise_if_redirect(response):
         raise requests.HTTPError
 
 
-def get_book_soup(book_url):
-    response = requests.get(book_url, allow_redirects=False)
+def get_book_soup(url_book):
+    response = requests.get(url_book, allow_redirects=False)
     raise_if_redirect(response)
     response.raise_for_status()
     return BeautifulSoup(response.text, 'lxml')
@@ -165,17 +165,17 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books_info = []
     books_urls = parse_urls(start_page, end_page)
-    for book_url in books_urls:
+    for url_book in books_urls:
         while True:
             try:
-                soup = get_book_soup(book_url)
+                soup = get_book_soup(url_book)
                 if not args.skip_txt:
-                    book_title, author_book = parse_title_author(soup)
-                    id_download = get_id_book(book_url)
-                    download_book(args.dest_folder, id_download)
+                    title_book, author_book = parse_title_author(soup)
+                    download_id = get_id_book(url_book)
+                    download_book(args.dest_folder, download_id)
 
                 if not args.skip_imgs:
-                    url_img = parse_image(soup, book_url)
+                    url_img = parse_image(soup, url_book)
                     img_filename, img_ext = download_img(
                         url_img, args.dest_folder)
             except requests.exceptions.ConnectionError:
@@ -185,11 +185,11 @@ if __name__ == '__main__':
                 sleep(30)
                 continue
             except requests.HTTPError:
-                print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
+                print(f'Ошибка - HTTPError, пропуск книги - {url_book}')
                 break
             if not args.skip_txt and not args.skip_imgs:
                 books_info.append(dump_book_details_to_dict(
-                    soup, book_title, author_book, img_filename, id_download))
+                    soup, title_book, author_book, img_filename, download_id))
             break
 
     json_path = os.getcwd()
