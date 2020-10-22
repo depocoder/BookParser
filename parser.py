@@ -62,31 +62,41 @@ def download_book(dest_folder, download_id):
         file.write(response.text)
 
 
-def parse_books_urls(start_page, end_page):
+def request_book_page_html(page, url_book):
+    response = requests.get(url_book, allow_redirects=False)
+    raise_if_redirect(response)
+    response.raise_for_status()
+    return response.text
+
+
+def parse_book_urls(html, url_book):
     book_links = []
-    for page_book in range(start_page, end_page + 1):
+    soup = BeautifulSoup(html, 'lxml')
+    link_parse = soup.select('table.d_book')
+    for link in link_parse:
+        link = link.select_one('a')['href']
+        book_links.append(urljoin(url_book, link))
+    return book_links
+
+
+def parse_urls(start_page, end_page):
+    book_links = []
+    for page in range(start_page, end_page + 1):
         while True:
             try:
-                url_book = f'https://tululu.org/l55/{page_book}'
-                response = requests.get(url_book, allow_redirects=False)
-                raise_if_redirect(response)
-                response.raise_for_status()
-                soup = BeautifulSoup(response.text, 'lxml')
-                link_parse = soup.select('table.d_book')
-                for link in link_parse:
-                    link = link.select_one('a')['href']
-                    book_links.append(urljoin(url_book, link))
+                url_book = f'https://tululu.org/l55/{page}'
+                html = request_book_page_html(page, url_book)
+                book_links += parse_book_urls(html, url_book)
+                break
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
                       ' Запуск повторно через 30 секунд.')
                 sleep(30)
-                continue
             except requests.HTTPError:
                 print('Ошибка - HTTPError, пропуск номера страницы -',
-                      page_book)
+                      page)
                 break
-            break
     return book_links
 
 
@@ -167,7 +177,7 @@ if __name__ == '__main__':
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books = []
-    books_urls = parse_books_urls(start_page, end_page)
+    books_urls = parse_urls(start_page, end_page)
     for url_book in books_urls:
         while True:
             try:
