@@ -101,12 +101,19 @@ def parse_urls(start_page, end_page):
 
 
 def dump_book_details_to_dict(
-        soup, title_book, author_book, img_filename, download_id):
+        soup, title_book, author_book, img_filename, img_ext, download_id,
+        skip_imgs, skip_txt):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    book_path = os.path.join('books', (
-        f'{download_id}-я книга. {title_book}.txt'))
-    img_src = os.path.join('images', img_filename + img_ext)
+    book_path = None
+    img_src = None
+    if not skip_imgs:
+        img_src = os.path.join('images', img_filename + img_ext)
+
+    if not skip_txt:
+        book_path = os.path.join('books', (
+            f'{download_id}-я книга. {title_book}.txt'))
+
     book_info = {
         'title': title_book,
         "author": author_book,
@@ -158,6 +165,7 @@ def create_argparse():
         '--skip_imgs', action="store_true",
         help='не скачивать картинки.')
     args = parser.parse_args()
+
     if not (args.start_page < args.end_page and args.start_page > 0
             and args.end_page > 0):
         sys.exit(
@@ -168,43 +176,48 @@ def create_argparse():
     return parser
 
 
-if __name__ == '__main__':
+def main():
     parser = create_argparse()
     args = parser.parse_args()
-    end_page = args.end_page
-    start_page = args.start_page
 
     Path(args.dest_folder, 'images').mkdir(parents=True, exist_ok=True)
     Path(args.dest_folder, 'books').mkdir(parents=True, exist_ok=True)
     books = []
-    books_urls = parse_urls(start_page, end_page)
+    books_urls = parse_urls(args.start_page, args.end_page)
     for url_book in books_urls:
         while True:
             try:
                 soup = get_book_soup(url_book)
+                title_book, author_book = parse_title_author(soup)
+                download_id = None
                 if not args.skip_txt:
-                    title_book, author_book = parse_title_author(soup)
                     download_id = get_id_book(url_book)
-                    download_book(args.dest_folder, download_id)
+                    download_book(args.dest_folder, download_id, title_book)
 
+                img_filename, img_ext = None, None
                 if not args.skip_imgs:
                     url_img = parse_image(soup, url_book)
                     img_filename, img_ext = download_img(
                         url_img, args.dest_folder)
+
+                books.append(dump_book_details_to_dict(
+                    soup, title_book, author_book,
+                    img_filename, img_ext, download_id,
+                    args.skip_imgs, args.skip_txt))
+                break
             except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
                       'Запуск повторно через 30 секунд.')
                 sleep(30)
-                continue
             except requests.HTTPError:
                 print(f'Ошибка - HTTPError, пропуск книги - {url_book}')
                 break
-            if not args.skip_txt and not args.skip_imgs:
-                books.append(dump_book_details_to_dict(
-                    soup, title_book, author_book, img_filename, download_id))
-            break
 
     json_path = os.path.join(args.dest_folder, "about_books.json")
     with open(json_path, "w", encoding='utf-8') as my_file:
         json.dump(books, my_file, indent=4, ensure_ascii=False)
+
+
+if __name__ == '__main__':
+    main()
