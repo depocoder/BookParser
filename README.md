@@ -42,5 +42,5 @@ python3 parser.py --start_page 1 --end_page 2
 **Запуск кода с аргументами**
 
 ```
-python3 parser.py --dest_folder "C:\Program Files" --skip_imgs
+python3 parser.py --start_page 10 --end_page 23 --dest_folder "C:\Program Files" --skip_imgs
 ```
