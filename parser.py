@@ -205,10 +205,6 @@ if __name__ == '__main__':
                     soup, title_book, author_book, img_filename, download_id))
             break
 
-    json_path = os.getcwd()
-    if args.dest_folder:
-        json_path = args.dest_folder
-    if not args.skip_txt and not args.skip_imgs:
-        json_path = os.path.join(json_path, "about_books.json")
-        with open(json_path, "w", encoding='utf-8') as my_file:
-            json.dump(books, my_file, indent=4, ensure_ascii=False)
+    json_path = os.path.join(args.dest_folder, "about_books.json")
+    with open(json_path, "w", encoding='utf-8') as my_file:
+        json.dump(books, my_file, indent=4, ensure_ascii=False)
