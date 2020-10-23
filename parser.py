@@ -38,6 +38,7 @@ def parse_image(soup, url_book):
 def download_img(url_img, dest_folder):
     response = requests.get(url_img, allow_redirects=False)
     response.raise_for_status()
+    raise_if_redirect(response)
     disassembled_url = urlparse(url_img)
     filename, file_ext = os.path.splitext(
         os.path.basename(disassembled_url.path))
@@ -48,16 +49,22 @@ def download_img(url_img, dest_folder):
     return rel_img_path
 
 
-def download_book(dest_folder, url_book, title_book):
-    download_id = url_book[url_book.find('/b')+2:-1]
+def request_book_download(download_id):
     response = requests.get("https://tululu.org/txt.php", params={
         "id": download_id, })
     response.raise_for_status()
+    raise_if_redirect(response)
+    return response.text
+
+
+def download_book(dest_folder, url_book, title_book):
+    download_id = url_book[url_book.find('/b')+2:-1]
+    html = request_book_download(download_id)
     filename = f"{download_id}-я книга. {title_book}.txt"
     rel_book_path = os.path.join('books', filename)
     book_path = os.path.join(dest_folder, rel_book_path)
     with open(book_path, "w", encoding='utf-8') as file:
-        file.write(response.text)
+        file.write(html)
     return rel_book_path
 
 
