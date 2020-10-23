@@ -48,12 +48,8 @@ def download_img(url_img, dest_folder):
     return rel_img_path
 
 
-def get_id_book(url_book):
+def download_book(dest_folder, url_book, title_book):
     download_id = url_book[url_book.find('/b')+2:-1]
-    return download_id
-
-
-def download_book(dest_folder, download_id, title_book):
     response = requests.get("https://tululu.org/txt.php", params={
         "id": download_id, })
     response.raise_for_status()
@@ -105,7 +101,7 @@ def parse_urls(start_page, end_page):
 
 def dump_book_details_to_dict(
         soup, title_book, author_book, rel_book_path,
-        rel_img_path, download_id,
+        rel_img_path,
         skip_imgs, skip_txt):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
@@ -185,12 +181,10 @@ def main():
             try:
                 soup = get_book_soup(url_book)
                 title_book, author_book = parse_title_author(soup)
-                download_id = None
                 rel_book_path = None
                 if not args.skip_txt:
-                    download_id = get_id_book(url_book)
                     rel_book_path = download_book(
-                        args.dest_folder, download_id, title_book)
+                        args.dest_folder, url_book, title_book)
 
                 rel_img_path = None
                 if not args.skip_imgs:
@@ -200,7 +194,7 @@ def main():
 
                 books.append(dump_book_details_to_dict(
                     soup, title_book, author_book, rel_book_path,
-                    rel_img_path, download_id,
+                    rel_img_path,
                     args.skip_imgs, args.skip_txt))
                 break
             except requests.exceptions.ConnectionError:
