@@ -52,14 +52,16 @@ def get_id_book(url_book):
     return download_id
 
 
-def download_book(dest_folder, download_id):
+def download_book(dest_folder, download_id, title_book):
     response = requests.get("https://tululu.org/txt.php", params={
         "id": download_id, })
     response.raise_for_status()
     filename = f"{download_id}-я книга. {title_book}.txt"
-    book_path = os.path.join(dest_folder, 'books', filename)
+    rel_book_path = os.path.join('books', filename)
+    book_path = os.path.join(dest_folder, rel_book_path)
     with open(book_path, "w", encoding='utf-8') as file:
         file.write(response.text)
+    return rel_book_path
 
 
 def request_book_page_html(page, url_book):
@@ -101,24 +103,20 @@ def parse_urls(start_page, end_page):
 
 
 def dump_book_details_to_dict(
-        soup, title_book, author_book, img_filename, img_ext, download_id,
+        soup, title_book, author_book, rel_book_path,
+        img_filename, img_ext, download_id,
         skip_imgs, skip_txt):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    book_path = None
     img_src = None
     if not skip_imgs:
         img_src = os.path.join('images', img_filename + img_ext)
-
-    if not skip_txt:
-        book_path = os.path.join('books', (
-            f'{download_id}-я книга. {title_book}.txt'))
 
     book_info = {
         'title': title_book,
         "author": author_book,
         'img_src': img_src,
-        'book_path': book_path,
+        'book_path': rel_book_path,
         'comments': comments,
         "genres": genres
     }
@@ -190,9 +188,11 @@ def main():
                 soup = get_book_soup(url_book)
                 title_book, author_book = parse_title_author(soup)
                 download_id = None
+                rel_book_path = None
                 if not args.skip_txt:
                     download_id = get_id_book(url_book)
-                    download_book(args.dest_folder, download_id, title_book)
+                    rel_book_path = download_book(
+                        args.dest_folder, download_id, title_book)
 
                 img_filename, img_ext = None, None
                 if not args.skip_imgs:
@@ -201,7 +201,7 @@ def main():
                         url_img, args.dest_folder)
 
                 books.append(dump_book_details_to_dict(
-                    soup, title_book, author_book,
+                    soup, title_book, author_book, rel_book_path,
                     img_filename, img_ext, download_id,
                     args.skip_imgs, args.skip_txt))
                 break
