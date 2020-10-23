@@ -41,10 +41,11 @@ def download_img(url_img, dest_folder):
     disassembled_url = urlparse(url_img)
     filename, file_ext = os.path.splitext(
         os.path.basename(disassembled_url.path))
-    image_path = os.path.join(dest_folder, 'images', filename + file_ext)
+    rel_img_path = os.path.join('images', filename + file_ext)
+    image_path = os.path.join(dest_folder, rel_img_path)
     with open(image_path, "wb") as file:
         file.write(response.content)
-    return filename, file_ext
+    return rel_img_path
 
 
 def get_id_book(url_book):
@@ -104,18 +105,15 @@ def parse_urls(start_page, end_page):
 
 def dump_book_details_to_dict(
         soup, title_book, author_book, rel_book_path,
-        img_filename, img_ext, download_id,
+        rel_img_path, download_id,
         skip_imgs, skip_txt):
     comments = parse_comments(soup)
     genres = parse_genres(soup)
-    img_src = None
-    if not skip_imgs:
-        img_src = os.path.join('images', img_filename + img_ext)
 
     book_info = {
         'title': title_book,
         "author": author_book,
-        'img_src': img_src,
+        'img_src': rel_img_path,
         'book_path': rel_book_path,
         'comments': comments,
         "genres": genres
@@ -194,15 +192,15 @@ def main():
                     rel_book_path = download_book(
                         args.dest_folder, download_id, title_book)
 
-                img_filename, img_ext = None, None
+                rel_img_path = None
                 if not args.skip_imgs:
                     url_img = parse_image(soup, url_book)
-                    img_filename, img_ext = download_img(
+                    rel_img_path = download_img(
                         url_img, args.dest_folder)
 
                 books.append(dump_book_details_to_dict(
                     soup, title_book, author_book, rel_book_path,
-                    img_filename, img_ext, download_id,
+                    rel_img_path, download_id,
                     args.skip_imgs, args.skip_txt))
                 break
             except requests.exceptions.ConnectionError:
