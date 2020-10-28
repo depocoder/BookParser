@@ -100,7 +100,7 @@ def parse_urls(start_page, end_page):
                       ' Запуск повторно через 30 секунд.')
                 sleep(30)
             except requests.HTTPError:
-                print('Ошибка - HTTPError, пропуск номера страницы -',
+                print('Страница не найдена, был пойман редирект. Пропуск -',
                       page)
                 break
     return book_urls
@@ -209,7 +209,8 @@ def main():
                       'Запуск повторно через 30 секунд.')
                 sleep(30)
             except requests.HTTPError:
-                print(f'Ошибка - HTTPError, пропуск книги - {book_url}')
+                print('Страница не найдена, был пойман редирект. Пропуск -',
+                      book_url)
                 break
 
     json_path = os.path.join(args.dest_folder, "about_books.json")
