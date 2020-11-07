@@ -36,7 +36,7 @@ def parse_image(soup, book_url):
 
 
 def download_img(url_img, dest_folder):
-    response = requests.get(url_img, allow_redirects=False)
+    response = requests.get(url_img, allow_redirects=False, verify=False)
     response.raise_for_status()
     raise_if_redirect(response)
     disassembled_url = urlparse(url_img)
@@ -51,7 +51,7 @@ def download_img(url_img, dest_folder):
 
 def request_book_download(download_id):
     response = requests.get("https://tululu.org/txt.php", params={
-        "id": download_id, })
+        "id": download_id, }, verify=False)
     response.raise_for_status()
     raise_if_redirect(response)
     return response.text
@@ -69,7 +69,7 @@ def download_book(dest_folder, book_url, book_title):
 
 
 def request_book_page_html(page, book_url):
-    response = requests.get(book_url, allow_redirects=False)
+    response = requests.get(book_url, allow_redirects=False, verify=False)
     raise_if_redirect(response)
     response.raise_for_status()
     return response.text
@@ -94,7 +94,7 @@ def parse_urls(start_page, end_page):
                 html = request_book_page_html(page, book_catalog_link)
                 book_urls += parse_book_urls(html, book_catalog_link)
                 break
-            except requests.exceptions.ConnectionError:
+            except requests.exceptions.ConnectionError as E:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
                       ' Запуск повторно через 30 секунд.')
@@ -129,7 +129,7 @@ def raise_if_redirect(response):
 
 
 def get_book_soup(book_url):
-    response = requests.get(book_url, allow_redirects=False)
+    response = requests.get(book_url, allow_redirects=False, verify=False)
     raise_if_redirect(response)
     response.raise_for_status()
     return BeautifulSoup(response.text, 'lxml')
