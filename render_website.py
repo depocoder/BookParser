@@ -21,10 +21,12 @@ def main():
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template('template.html')
-
+    count_pages = len(chunked_about_books)
     for page, books in enumerate(chunked_about_books, 1):
         rendered_page = template.render(
-            books=books
+            books=books,
+            count_pages=count_pages,
+            current_page=page,
         )
 
         with open(f'pages/index{page}.html', 'w', encoding="utf8") as file:
