@@ -1,27 +1,38 @@
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 import json
+import os
+from pathlib import Path
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server, shell
+from more_itertools import chunked
 
 
-with open("about_books.json", "r") as my_file:
-    about_books = my_file.read()
-about_books = json.loads(about_books)
-
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
-
-template = env.get_template('template.html')
-
-rendered_page = template.render(
-    about_books=about_books
-)
-
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+def get_about_books():
+    with open("about_books.json", "r") as my_file:
+        about_books = my_file.read()
+    return json.loads(about_books)
 
 
-server = Server()
-server.watch('*.html', shell('make html'))
-server.serve(root='')
+def main():
+    Path(os.getcwd(), 'pages').mkdir(parents=True, exist_ok=True)
+    about_books = get_about_books()
+    chunked_about_books = list(chunked(about_books, 10))
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    template = env.get_template('template.html')
+
+    for page, books in enumerate(chunked_about_books, 1):
+        rendered_page = template.render(
+            books=books
+        )
+
+        with open(f'pages/index{page}.html', 'w', encoding="utf8") as file:
+            file.write(rendered_page)
+    server = Server()
+    server.watch('*.html', shell('make html'))
+    server.serve(root='')
+
+
+if __name__ == "__main__":
+    main()
