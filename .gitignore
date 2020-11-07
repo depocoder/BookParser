@@ -1,9 +1,5 @@
 *env
 .DS_Store
 .env
-*pages
 about_books.json
 .gitattributes
-*books
-*images
-index.html
