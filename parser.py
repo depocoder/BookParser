@@ -94,7 +94,7 @@ def parse_urls(start_page, end_page):
                 html = request_book_page_html(page, book_catalog_link)
                 book_urls += parse_book_urls(html, book_catalog_link)
                 break
-            except requests.exceptions.ConnectionError as E:
+            except requests.exceptions.ConnectionError:
                 print('Ошибка - ConnectionError.',
                       'Проверьте подключение с интернетом.',
                       ' Запуск повторно через 30 секунд.')
