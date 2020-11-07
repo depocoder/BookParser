@@ -13,9 +13,8 @@
   <body>
     <div class="container">
       <div class="row">
-        {% for books in chunked_about_books %}
-          {% for book in books %}
-            <div class="col">
+        {% for book in about_books %}
+            <div class="col-6">
               <div class="card mb-3" style="max-width: 540px;">
                   <div class="row no-gutters">
                     <div class="col-md-4">
@@ -32,8 +31,6 @@
                 </div>
               </div>
           {%endfor%}
-          <div class="w-100"></div>
-        {%endfor%}
       </div>
     </div>
 
