@@ -7,7 +7,7 @@ from more_itertools import chunked
 
 
 def get_about_books():
-    with open("about_books.json", "r") as my_file:
+    with open("about_books.json", "r", encoding='utf-8') as my_file:
         about_books = my_file.read()
     return json.loads(about_books)
 
