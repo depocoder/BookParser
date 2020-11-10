@@ -1,5 +1,6 @@
 import json
 import os
+from functools import partial
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
@@ -12,9 +13,7 @@ def get_books():
     return json.loads(about_books)
 
 
-def rebuild_html():
-    about_books = get_books()
-    chunked_about_books = list(chunked(about_books, 10))
+def rebuild_html(chunked_about_books):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -33,9 +32,14 @@ def rebuild_html():
 
 def main():
     Path(os.getcwd(), 'pages').mkdir(parents=True, exist_ok=True)
-    rebuild_html()
+    about_books = get_books()
+    chunked_about_books = list(chunked(about_books, 10))
+    
+    rebuild_html_with_argument = partial(
+        rebuild_html, chunked_about_books=chunked_about_books)
+    rebuild_html_with_argument()
     server = Server()
-    server.watch('template.html', rebuild_html)
+    server.watch('template.html', rebuild_html_with_argument)
     server.serve(root='')
 
 
