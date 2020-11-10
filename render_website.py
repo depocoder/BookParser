@@ -34,7 +34,6 @@ def main():
     Path(os.getcwd(), 'pages').mkdir(parents=True, exist_ok=True)
     about_books = get_books()
     chunked_about_books = list(chunked(about_books, 10))
-    
     rebuild_html_with_argument = partial(
         rebuild_html, chunked_about_books=chunked_about_books)
     rebuild_html_with_argument()
