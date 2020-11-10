@@ -1,7 +1,5 @@
 # BookParser
 
-## Описание проекта
-
 Этот проект позволяет парсить книги с [**сайта tululu.org**](https://tululu.org/). После чего просматривать их на [**html страничках**](https://herypank.github.io/BookParser/pages/index1.html).
 
 
