@@ -6,7 +6,7 @@ from livereload import Server, shell
 from more_itertools import chunked
 
 
-def get_about_books():
+def get_books():
     with open("about_books.json", "r", encoding='utf-8') as my_file:
         about_books = my_file.read()
     return json.loads(about_books)
@@ -14,7 +14,7 @@ def get_about_books():
 
 def main():
     Path(os.getcwd(), 'pages').mkdir(parents=True, exist_ok=True)
-    about_books = get_about_books()
+    about_books = get_books()
     chunked_about_books = list(chunked(about_books, 10))
     env = Environment(
         loader=FileSystemLoader('.'),
