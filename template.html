@@ -12,7 +12,8 @@
     <title>Страница №{{current_page}}</title>
   </head>
   <body>
-    <div class="container">
+    <hr/>
+    <div class="mx-auto" style="width: 1110px;">
       <nav aria-label="Page navigation example">
         <ul class="pagination">
           {% if current_page==1 %}
@@ -34,6 +35,8 @@
           {% endif %}
         </ul>
       </nav>
+    </div>
+    <div class="container">
       <div class="row">
         {% for book in books %}
             <div class="col-6">
