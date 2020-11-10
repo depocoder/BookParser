@@ -1,19 +1,19 @@
 # BookParser
 
-## Описание проекта.
+## Описание проекта
 
-Этот проект позволяет парсить книги с [**сайта**](https://tululu.org/) . После чего просматривать их на [**html страничках**](https://herypank.github.io/BookParser/pages/index1.html).
+Этот проект позволяет парсить книги с [**сайта tululu.org**](https://tululu.org/). После чего просматривать их на [**html страничках**](https://herypank.github.io/BookParser/pages/index1.html).
 
 
-## Подготовка к запуску MAC OS.
+## Подготовка к запуску MAC OS
 
-*Уставновить Python 3+.*
+Уставновить Python 3+
 
 ```
 sudo apt-get install python3
 ```
 
-*Установить, создать и активировать виртуальное окружение.*
+Установить, создать и активировать виртуальное окружение
 
 ```
 pip3 install virtualenv
@@ -21,20 +21,20 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-*Установить библиотеки командой.*
+Установить библиотеки командой
 
 ```
 pip3 install -r requirements.txt
 ```
 
-## Запуск кода.
+## Запуск кода
 
-*Парсинг данных*
+Парсинг данных
 ```
 python3 parser.py --start_page 1 --end_page 2
 ```
     
-*Запуск сайта на своем компьютере*   
+Запуск сайта на своем компьютере   
 
 ```
 python3 render_website.py
