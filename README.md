@@ -38,6 +38,7 @@ python3 parser.py --start_page 1 --end_page 2
 python3 render_website.py
 ```
 
+Переходи по адресу [**http://127.0.0.1:5500/pages/index1.html**](http://127.0.0.1:5500/pages/index1.html)
 # Аргументы
 
 1. `start_page` - *обязательный аргумент* - страница с которой начнется парсинг книг.   
