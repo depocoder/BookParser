@@ -3,7 +3,7 @@ import sys
 import argparse
 import json
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, quote
 from time import sleep
 
 import requests
@@ -115,8 +115,8 @@ def dump_book_details_to_dict(
     book_info = {
         'title': book_title,
         "author": book_author,
-        'img_src': rel_img_path,
-        'book_path': rel_book_path,
+        'img_src': quote(rel_img_path, safe=''),
+        'book_path': quote(rel_book_path, safe=''),
         'comments': comments,
         "genres": genres
     }

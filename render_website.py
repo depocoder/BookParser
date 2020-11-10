@@ -33,6 +33,7 @@ def rebuild_html():
 
 def main():
     Path(os.getcwd(), 'pages').mkdir(parents=True, exist_ok=True)
+    rebuild_html()
     server = Server()
     server.watch('template.html', rebuild_html)
     server.serve(root='')
