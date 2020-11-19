@@ -1,6 +1,8 @@
 # BookParser
 
-Этот проект позволяет парсить книги с [**сайта tululu.org**](https://tululu.org/). После чего просматривать их на [**html страничках**](https://herypank.github.io/BookParser/pages/index1.html).
+Этот проект позволяет парсить книги с [**сайта tululu.org**](https://tululu.org/). После чего просматривать их на [**html страничках**](https://herypank.github.io/BookParser/pages/index1.html).    
+Все html страницы находятся в папке pages. Если вы хотите открыть вашу библиотеку без интернета, вам нужно открыть любой файл в браузере из папки pages, дальше можете перемещаться по страницам в самом браузере.  
+Подробнее о том как открыть html файл - [инструкция с скриншотами и видео](https://urfix.ru/open-html-file/)
 ![](https://i.imgur.com/NLwEzvz.png)
 
 ## Подготовка к запуску Mac OS
@@ -41,7 +43,7 @@ python3 render_website.py
 ```
 
 Переходи по адресу [**http://127.0.0.1:5500/pages/index1.html**](http://127.0.0.1:5500/pages/index1.html)
-# Аргументы
+# Аргументы парсера
 
 1. `start_page` - *обязательный аргумент* - страница с которой начнется парсинг книг.   
 2. `end_page` - *обязательный аргумент* - страница с которой начнется парсинг книг.   
@@ -49,7 +51,7 @@ python3 render_website.py
 4. `skip_imgs` — не скачивать картинки, при этом аргументе about_books.json не создается.
 5. `skip_txt` — не скачивать книги, при этом аргументе about_books.json не создается.   
     
-**Запуск кода с аргументами**
+**Запуск парсера с аргументами**
 
 ```
 python3 parser.py --start_page 10 --end_page 23 --dest_folder "C:\Program Files" --skip_imgs
