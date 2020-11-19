@@ -18,12 +18,12 @@ def rebuild_html(chunked_about_books):
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
-    count_pages = len(chunked_about_books)
+    pages_count = len(chunked_about_books)
     template = env.get_template('template.html')
     for page, books in enumerate(chunked_about_books, 1):
         rendered_page = template.render(
             books=books,
-            count_pages=count_pages,
+            pages_count=pages_count,
             current_page=page,
         )
         with open(f'pages/index{page}.html', 'w', encoding="utf8") as file:
