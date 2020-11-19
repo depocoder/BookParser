@@ -20,14 +20,14 @@
           {% else %}
             <li class="page-item"><a class="page-link" href="index{{current_page-1}}.html">Previous</a></li>
           {% endif %}
-          {% for page in  range(1, count_pages + 1) %}
+          {% for page in  range(1, pages_count + 1) %}
             {% if page==current_page %}
               <li class="page-item active" aria-current="page"><a class="page-link" href="index{{page}}.html">{{page}}<span class="sr-only">(current)</span></a></li>
             {% else %}
               <li class="page-item"><a class="page-link" href="index{{page}}.html">{{page}}</a></li>
             {% endif %}
           {% endfor %}
-          {% if current_page==count_pages %}
+          {% if current_page==pages_count %}
             <li class="page-item disabled"><a class="page-link" tabindex="-1" aria-disabled="true" href="#">Next</a></li>
           {% else %}
             <li class="page-item"><a class="page-link" href="index{{current_page+1}}.html">Next</a></li>
