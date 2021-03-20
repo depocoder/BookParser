@@ -2,6 +2,6 @@ requests==2.24.0
 bs4==0.0.1
 lxml==4.5.2
 pathvalidate==2.3.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 more-itertools==8.6.0
 livereload==2.6.3
